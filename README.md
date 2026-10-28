@@ -21,6 +21,10 @@ A standalone, one-page job-search website that started in **Modesto, CA 95355 (S
 - **🇪🇸 + ♿ EN/ES + accessibility** — Spanish toggle for the main interface (headings, controls, stats, checklist), **A+ large-text** and **◐ high-contrast** toggles, all saved as display preferences.
 - **🔐 Encrypted Admin** — see below.
 
+## New in v4 — job-board redesign
+
+The page is now organized like a real job board (Indeed/ZipRecruiter pattern): a sticky top bar with the site nav, a white **search hero** (job + city/ZIP/county/transport with one big Search Jobs button), popular searches as **category tiles**, a **filters sidebar** beside live result cards with site avatars, Today's Focus as a compact dashboard strip, My Applications as the tracker dashboard, and help/admin de-emphasized below — plus a mobile bottom nav (Search · Applications · Plan · Help). Same engine underneath: 58 counties, live search URLs, profiles, encrypted admin.
+
 ## New in v3 — Professional design + automations
 
 - **🎨 Professional redesign** — branded hero (inline SVG logo mark, no external images), trust badges (Free / No sign-up / 58 counties / Offline / Private), deeper navy-teal-gold theme, pill buttons, hover-lift cards, and an auto-save indicator (“✓ Auto-saved on this device at …”) so users always know their work is safe.
