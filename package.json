@@ -1,0 +1,10 @@
+{
+  "name": "stanislaus-job-finder",
+  "version": "1.0.0",
+  "description": "Standalone job-search helper for Modesto, CA 95355 (Stanislaus County) — remote-first, walk/bike and bus-friendly job searching with a private in-browser application tracker.",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "start": "node serve.mjs"
+  }
+}
