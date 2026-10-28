@@ -27,8 +27,19 @@
       </div>
     </div>
 
-    <h1 data-i18n="heroTitle">California Job Finder</h1>
+    <div class="brand-row">
+      <div class="logo-badge" aria-hidden="true">
+        <svg viewBox="0 0 48 48" width="40" height="40" role="img"><circle cx="24" cy="19" r="9" fill="#ffd166"/><path d="M24 44c-7-8.2-11-13.3-11-19a11 11 0 1 1 22 0c0 5.7-4 10.8-11 19z" fill="#ffffff" opacity=".92"/><circle cx="24" cy="24.5" r="4.2" fill="#0e7a5f"/></svg>
+      </div>
+      <div>
+        <h1 data-i18n="heroTitle">California Job Finder</h1>
+        <p class="brand-sub">Free job search &amp; application tracking for every California county</p>
+      </div>
+    </div>
     <p class="lede" data-i18n="heroLede">Built in Stanislaus County, now for anyone in California. Pick your county, city and ZIP — remote first, then walk/bike, then transit-friendly. Track every application privately on this device. No account, no sign-up.</p>
+    <div class="trust-chips" aria-label="Why use this tool">
+      <span>✓ 100% free</span><span>✓ No sign-up</span><span>✓ All 58 CA counties</span><span>✓ Works offline</span><span>✓ Your data never leaves this device</span>
+    </div>
 
     <div class="stats-bar" role="region" aria-label="Your application stats">
       <div class="stat"><span class="stat-num" id="statTotal">0</span><span class="stat-label" data-i18n="totalTracked">Total tracked</span></div>
@@ -48,10 +59,23 @@
       <a href="#help">🆘 <span data-i18n="navHelp">Free Help</span></a>
     </nav>
     <p class="hero-note">🔒 <span data-i18n="heroNote">Private by design: profiles, applications and settings are saved only in this browser. Use Backup regularly — clearing browser data erases this device's copy.</span></p>
+    <p class="autosave-pill" id="autosavePill" aria-live="polite">✓ Auto-save is on — every change saves to this device instantly</p>
   </div>
 </header>
 
 <main class="wrap">
+
+  <!-- ======================= TODAY'S FOCUS (auto) ======================= -->
+  <section class="card focus-card" id="focus" aria-labelledby="focusTitle">
+    <div class="focus-head">
+      <div>
+        <h2 id="focusTitle">⚡ Today’s Focus <span class="auto-badge">AUTO</span></h2>
+        <p class="muted">Built automatically from your tracker: what’s overdue, what’s due, what to apply to next. Updates the moment anything changes.</p>
+      </div>
+      <button type="button" class="btn btn-secondary btn-sm" id="notifyBtn">🔔 Enable due-date reminders</button>
+    </div>
+    <div id="focusContent"></div>
+  </section>
 
   <!-- ======================= RECOMMENDED ======================= -->
   <section class="card advice" id="recommend" aria-labelledby="recTitle">
@@ -208,6 +232,14 @@
     <form id="jobForm" class="job-form" novalidate>
       <h3 id="formTitle">＋ Add a job</h3>
       <input type="hidden" id="editId" value="">
+      <div class="smart-paste">
+        <label for="pasteText">✨ Fast add — paste a posting (or just its link) and auto-fill the form</label>
+        <textarea id="pasteText" rows="3" placeholder="Paste job posting text here, e.g. copy from Indeed…&#10;Warehouse Associate — Amazon — Modesto, CA 95351 — $19.50/hr — Remote…"></textarea>
+        <div class="toolbar">
+          <button type="button" class="btn btn-primary btn-sm" id="autofillBtn">✨ Auto-fill from paste</button>
+          <span class="small muted">Detects title, company, city/ZIP, pay, distance &amp; remote. Check it, then save.</span>
+        </div>
+      </div>
       <div class="form-grid">
         <div class="field"><label for="fTitle">Job title *</label><input id="fTitle" type="text" required placeholder="e.g. Warehouse Associate"></div>
         <div class="field"><label for="fCompany">Company</label><input id="fCompany" type="text" placeholder="e.g. Walmart"></div>
