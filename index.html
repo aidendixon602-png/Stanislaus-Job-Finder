@@ -10,8 +10,17 @@
 <body>
 <a class="skip-link" href="#setup">Skip to setup</a>
 <div class="admin-banner" id="adminBanner" hidden></div>
+<nav class="appbar" aria-label="Main">
+  <div class="wrap appbar-in">
+    <a class="appbar-brand" href="#top" aria-label="California Job Finder home"><span class="appbar-dot">CA</span> California <strong>Job Finder</strong></a>
+    <div class="appbar-links">
+      <a href="#find">Find Jobs</a><a href="#tracker">My Applications</a><a href="#county">County Help</a><a href="#weekly">Weekly Plan</a><a href="#help">Free Help</a>
+    </div>
+    <span class="appbar-free">100% FREE</span>
+  </div>
+</nav>
 
-<header class="hero">
+<header class="hero" id="top">
   <div class="wrap">
     <div class="topbar">
       <p class="eyebrow">📍 California • <span id="heroLocation">Stanislaus County • Modesto, CA 95355</span></p>
@@ -40,6 +49,84 @@
     <div class="trust-chips" aria-label="Why use this tool">
       <span>✓ 100% free</span><span>✓ No sign-up</span><span>✓ All 58 CA counties</span><span>✓ Works offline</span><span>✓ Your data never leaves this device</span>
     </div>
+
+    <div class="search-panel" role="search" aria-label="Job search">
+      <div class="search-main">
+        <div class="field">
+      <label for="keywordInput" data-i18n="jobLooking">Job I’m looking for</label>
+      <input type="text" id="keywordInput" placeholder="e.g. warehouse associate" value="entry level" autocomplete="off">
+      <p class="field-hint" data-i18n="keywordHint">Typing updates every search button instantly.</p>
+    </div>
+        <a class="btn btn-search" href="#find">🔎 Search Jobs</a>
+      </div>
+      <div class="search-where">
+        <div class="field">
+        <label for="countySelect" data-i18n="county">County (all 58 in California)</label>
+        <select id="countySelect"></select>
+        <p class="field-hint" id="countyHint"></p>
+      </div>
+        <div class="field">
+        <label for="cityInput" data-i18n="city">City</label>
+        <input type="text" id="cityInput" value="Modesto" autocomplete="address-level2">
+        <p class="field-hint"><button type="button" class="link-btn" id="useSeatBtn">⌖ <span data-i18n="useSeat">Use county seat</span></button></p>
+      </div>
+        <div class="field">
+        <label for="zipInput">ZIP code</label>
+        <input type="text" id="zipInput" value="95355" inputmode="numeric" maxlength="5" autocomplete="postal-code" placeholder="e.g. 95355">
+        <p class="field-hint" data-i18n="zipHint">Your 5-digit ZIP centers every radius search.</p>
+      </div>
+        <div class="field">
+        <label for="transportSelect" data-i18n="transport">How I’ll get to work</label>
+        <select id="transportSelect">
+          <option value="nocar" selected>🚫🚗 No car — remote + nearby (5 miles)</option>
+          <option value="walkbike">🚶 Walk / bike only (3 miles)</option>
+          <option value="bus">🚌 Bus / transit (10 miles)</option>
+          <option value="car">🚗 Have a car (25 miles)</option>
+        </select>
+        <p class="field-hint" id="radiusHint">Search radius: <strong>5 miles</strong> + remote jobs.</p>
+      </div>
+      </div>
+      <details class="search-more"><summary>More options — work type &amp; experience</summary>
+        <div class="search-more-grid"><div class="field">
+        <label for="workTypeSelect" data-i18n="workType">Work type</label>
+        <select id="workTypeSelect">
+          <option value="any" selected>Any work type</option>
+          <option value="fulltime">Full-time</option>
+          <option value="parttime">Part-time</option>
+          <option value="remote">Remote / work from home</option>
+        </select>
+        <p class="field-hint" data-i18n="workTypeHint">Added as a filter on the big boards that support it.</p>
+      </div><div class="field">
+        <label for="experienceSelect" data-i18n="experience">Experience level</label>
+        <select id="experienceSelect">
+          <option value="entry" selected>Entry-level / first job</option>
+          <option value="some">Some experience</option>
+          <option value="experienced">Experienced</option>
+          <option value="student">Student</option>
+          <option value="returning">Returning to work</option>
+        </select>
+        <p class="field-hint" data-i18n="expHint">Used for your recommendations and weekly plan focus.</p>
+      </div></div>
+      </details>
+      <p class="tiles-label">Popular searches — tap a category:</p>
+      <div class="chips" id="chips" role="group" aria-labelledby="chipsLabel">
+      <button type="button" class="chip is-active" data-keyword="entry level">Any entry-level</button>
+      <button type="button" class="chip" data-keyword="remote customer service">🏠 Remote Customer Service</button>
+      <button type="button" class="chip" data-keyword="remote data entry">🏠 Remote Data Entry</button>
+      <button type="button" class="chip" data-keyword="retail cashier">Retail / Cashier</button>
+      <button type="button" class="chip" data-keyword="grocery stocker">Grocery Stocker</button>
+      <button type="button" class="chip" data-keyword="food service fast food">Food Service</button>
+      <button type="button" class="chip" data-keyword="warehouse associate">Warehouse</button>
+      <button type="button" class="chip" data-keyword="janitor cleaner">Janitor</button>
+      <button type="button" class="chip" data-keyword="caregiver">Caregiver</button>
+      <button type="button" class="chip" data-keyword="call center customer service">Call Center</button>
+      <button type="button" class="chip" data-keyword="security guard">Security Guard</button>
+      <button type="button" class="chip" data-keyword="general labor">General Labor</button>
+      <button type="button" class="chip" data-keyword="delivery driver" data-warn="true">Delivery Driver 🚗</button>
+    </div>
+      <p class="warning-box" id="chipWarning" hidden>🚗 <strong data-i18n="deliveryWarnT">Heads up:</strong> <span data-i18n="deliveryWarn">Delivery Driver jobs almost always require your own car, a valid license, and insurance. Double-check the listing says “no car needed” before spending time on it.</span></p>
+    </div>
+
 
     <div class="stats-bar" role="region" aria-label="Your application stats">
       <div class="stat"><span class="stat-num" id="statTotal">0</span><span class="stat-label" data-i18n="totalTracked">Total tracked</span></div>
@@ -110,78 +197,8 @@
       </div>
     </div>
 
-    <div class="controls-grid location-grid">
-      <div class="field">
-        <label for="countySelect" data-i18n="county">County (all 58 in California)</label>
-        <select id="countySelect"></select>
-        <p class="field-hint" id="countyHint"></p>
-      </div>
-      <div class="field">
-        <label for="cityInput" data-i18n="city">City</label>
-        <input type="text" id="cityInput" value="Modesto" autocomplete="address-level2">
-        <p class="field-hint"><button type="button" class="link-btn" id="useSeatBtn">⌖ <span data-i18n="useSeat">Use county seat</span></button></p>
-      </div>
-      <div class="field">
-        <label for="zipInput">ZIP code</label>
-        <input type="text" id="zipInput" value="95355" inputmode="numeric" maxlength="5" autocomplete="postal-code" placeholder="e.g. 95355">
-        <p class="field-hint" data-i18n="zipHint">Your 5-digit ZIP centers every radius search.</p>
-      </div>
-      <div class="field">
-        <label for="transportSelect" data-i18n="transport">How I’ll get to work</label>
-        <select id="transportSelect">
-          <option value="nocar" selected>🚫🚗 No car — remote + nearby (5 miles)</option>
-          <option value="walkbike">🚶 Walk / bike only (3 miles)</option>
-          <option value="bus">🚌 Bus / transit (10 miles)</option>
-          <option value="car">🚗 Have a car (25 miles)</option>
-        </select>
-        <p class="field-hint" id="radiusHint">Search radius: <strong>5 miles</strong> + remote jobs.</p>
-      </div>
-      <div class="field">
-        <label for="workTypeSelect" data-i18n="workType">Work type</label>
-        <select id="workTypeSelect">
-          <option value="any" selected>Any work type</option>
-          <option value="fulltime">Full-time</option>
-          <option value="parttime">Part-time</option>
-          <option value="remote">Remote / work from home</option>
-        </select>
-        <p class="field-hint" data-i18n="workTypeHint">Added as a filter on the big boards that support it.</p>
-      </div>
-      <div class="field">
-        <label for="experienceSelect" data-i18n="experience">Experience level</label>
-        <select id="experienceSelect">
-          <option value="entry" selected>Entry-level / first job</option>
-          <option value="some">Some experience</option>
-          <option value="experienced">Experienced</option>
-          <option value="student">Student</option>
-          <option value="returning">Returning to work</option>
-        </select>
-        <p class="field-hint" data-i18n="expHint">Used for your recommendations and weekly plan focus.</p>
-      </div>
-    </div>
 
-    <div class="field">
-      <label for="keywordInput" data-i18n="jobLooking">Job I’m looking for</label>
-      <input type="text" id="keywordInput" placeholder="e.g. warehouse associate" value="entry level" autocomplete="off">
-      <p class="field-hint" data-i18n="keywordHint">Typing updates every search button instantly.</p>
-    </div>
 
-    <p class="chips-label" id="chipsLabel" data-i18n="quickPicks">Quick picks — tap one:</p>
-    <div class="chips" id="chips" role="group" aria-labelledby="chipsLabel">
-      <button type="button" class="chip is-active" data-keyword="entry level">Any entry-level</button>
-      <button type="button" class="chip" data-keyword="remote customer service">🏠 Remote Customer Service</button>
-      <button type="button" class="chip" data-keyword="remote data entry">🏠 Remote Data Entry</button>
-      <button type="button" class="chip" data-keyword="retail cashier">Retail / Cashier</button>
-      <button type="button" class="chip" data-keyword="grocery stocker">Grocery Stocker</button>
-      <button type="button" class="chip" data-keyword="food service fast food">Food Service</button>
-      <button type="button" class="chip" data-keyword="warehouse associate">Warehouse</button>
-      <button type="button" class="chip" data-keyword="janitor cleaner">Janitor</button>
-      <button type="button" class="chip" data-keyword="caregiver">Caregiver</button>
-      <button type="button" class="chip" data-keyword="call center customer service">Call Center</button>
-      <button type="button" class="chip" data-keyword="security guard">Security Guard</button>
-      <button type="button" class="chip" data-keyword="general labor">General Labor</button>
-      <button type="button" class="chip" data-keyword="delivery driver" data-warn="true">Delivery Driver 🚗</button>
-    </div>
-    <p class="warning-box" id="chipWarning" hidden>🚗 <strong data-i18n="deliveryWarnT">Heads up:</strong> <span data-i18n="deliveryWarn">Delivery Driver jobs almost always require your own car, a valid license, and insurance. Double-check the listing says “no car needed” before spending time on it.</span></p>
 
     <div class="toolbar">
       <button type="button" class="btn btn-secondary btn-sm" id="saveSearchBtn">⭐ <span data-i18n="saveSearch">Save this search</span></button>
@@ -201,13 +218,18 @@
     <p class="muted" data-i18n="findIntro">Nothing here is a copied list and nothing is scraped — every button builds a live search for your job + your city/ZIP on that site’s real results.</p>
     <div class="search-summary" id="searchSummary" aria-live="polite"></div>
 
-    <div class="controls-grid tracker-filters">
-      <div class="field"><label for="siteFilter" data-i18n="filterSites">Filter the job sites</label><input type="text" id="siteFilter" placeholder="Try “remote”, “county”, “walmart”, “veterans”" autocomplete="off"><p class="field-hint" id="siteCount" aria-live="polite"></p></div>
-      <div class="field"><label for="favOnly">★ <span data-i18n="favOnly">Favorite sites only</span></label><span class="check-line"><input type="checkbox" id="favOnly"> <span data-i18n="favOnlyHint">Show only sites you starred</span></span><p class="field-hint" data-i18n="favHint">Tap ☆ on any site card to favorite it.</p></div>
+    <div class="find-layout">
+      <aside class="filters-panel" aria-label="Search filters">
+        <h3 class="filters-title">🎛 Filters</h3>
+        <div class="field"><label for="siteFilter" data-i18n="filterSites">Filter the job sites</label><input type="text" id="siteFilter" placeholder="Try “remote”, “county”, “walmart”, “veterans”" autocomplete="off"><p class="field-hint" id="siteCount" aria-live="polite"></p></div>
+        <div class="field"><label for="favOnly">★ <span data-i18n="favOnly">Favorite sites only</span></label><span class="check-line"><input type="checkbox" id="favOnly"> <span data-i18n="favOnlyHint">Show only sites you starred</span></span><p class="field-hint" data-i18n="favHint">Tap ☆ on any site card to favorite it.</p></div>
+      </aside>
+      <div class="results-col">
+        <h3 class="subhead">⭐ <span data-i18n="startHere">Start here — best first searches for you</span></h3>
+        <p class="results-note">Live openings are on the employer &amp; job-board sites — each card opens a real, current search. ☆ save your favorites, ＋ Track jobs you apply to.</p>
+        <div class="site-grid" id="featuredGrid"></div>
+      </div>
     </div>
-
-    <h3 class="subhead">⭐ <span data-i18n="startHere">Start here — best first searches for you</span></h3>
-    <div class="site-grid" id="featuredGrid"></div>
   </section>
 
   <!-- ======================= TRACKER ======================= -->
@@ -438,6 +460,12 @@
   <p class="small">58-county edition • Print your Weekly Plan and bring it to your local America’s Job Center for free one-on-one help.</p>
 </footer>
 
+<nav class="mobile-nav" aria-label="Mobile">
+  <a href="#find"><span>🔎</span>Search</a>
+  <a href="#tracker"><span>🗂️</span>Applications</a>
+  <a href="#weekly"><span>🗓️</span>Plan</a>
+  <a href="#help"><span>🆘</span>Help</a>
+</nav>
 <script src="app.js"></script>
 </body>
 </html>

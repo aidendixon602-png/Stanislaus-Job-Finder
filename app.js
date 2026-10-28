@@ -224,7 +224,7 @@ function siteCard(site, c) {
   const href = safeUrl(site.url(c)) || '#';
   const fav = (settings.favoriteSiteIds || []).includes(site.id);
   const searchLabel = prefs.lang === 'es' ? 'Buscar' : 'Search';
-  return '<article class="site-card"><div class="site-head"><span class="site-cat">' + esc(CAT_LABEL[site.cat] || site.cat) + (site.cat === 'custom' ? ' • Admin' : '') + '</span>' +
+  return '<article class="site-card"><div class="site-head"><span class="site-avatar" aria-hidden="true">' + esc((site.name || '?').charAt(0)) + '</span><span class="site-cat">' + esc(CAT_LABEL[site.cat] || site.cat) + (site.cat === 'custom' ? ' • Admin' : '') + '</span>' +
     '<button type="button" class="fav-btn' + (fav ? ' is-fav' : '') + '" data-fav="' + esc(site.id) + '" aria-label="Favorite ' + esc(site.name) + '" title="Favorite">' + (fav ? '★' : '☆') + '</button></div>' +
     '<h4>' + esc(site.name) + '</h4><p>' + esc(site.desc) + '</p><div class="site-actions">' +
     '<a class="btn btn-primary btn-sm" href="' + esc(href) + '" target="_blank" rel="noopener">🔎 ' + searchLabel + ' “' + esc(c.kw) + '” ↗</a>' +
