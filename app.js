@@ -329,8 +329,75 @@ function renderApps() {
   const done = apps.filter((a) => a.dateApplied && a.dateApplied >= weekAgo && a.status !== 'Saved').length;
   $('#goalFill').style.width = Math.min(100, Math.round((done / goal) * 100)) + '%';
   $('#goalText').textContent = done + ' / ' + goal + ' applications in the last 7 days' + (done >= goal ? ' — goal reached! 🎉' : '');
+  renderFocus(done, goal);
 }
-function persistApps() { save(pkey(meta.activeId, 'apps'), apps); }
+function persistApps() { save(pkey(meta.activeId, 'apps'), apps); showSaved(); }
+
+/* ---------------- Automations: Today's Focus, auto-save, smart paste ---------------- */
+function addDaysISO(iso, n) { const d = new Date((iso || todayISO()) + 'T12:00:00'); d.setDate(d.getDate() + n); return todayISO(d); }
+function showSaved() { const el = $('#autosavePill'); if (!el) return; const now = new Date(); el.textContent = '✓ Auto-saved on this device at ' + now.toLocaleTimeString([], { hour: 'numeric', minute: '2-digit' }); }
+function markBackup() { settings.lastBackupAt = Date.now(); persistSettings(); }
+function renderFocus(doneCount, goalCount) {
+  const el = $('#focusContent'); if (!el) return;
+  const overdue = apps.filter(isOverdue).slice().sort((a, b) => String(a.followUp).localeCompare(String(b.followUp)));
+  const in7 = addDaysISO(todayISO(), 7);
+  const dueSoon = apps.filter((a) => a.followUp && !isOverdue(a) && !['Offer','Rejected','Archived'].includes(a.status) && a.followUp <= in7);
+  const savedOnly = apps.filter((a) => a.status === 'Saved');
+  const staleCut = Date.now() - 14 * 864e5;
+  const stale = savedOnly.filter((a) => (a.createdAt || Date.now()) < staleCut);
+  const lastBackup = Number(settings.lastBackupAt) || 0;
+  const backupDue = apps.length >= 3 && (!lastBackup || Date.now() - lastBackup > 14 * 864e5);
+  const c = ctx(); const sites = allSites();
+  const quick = ['indeed', 'google', 'ziprecruiter'].map((id) => sites.find((s) => s.id === id)).filter(Boolean)
+    .map((s) => '<a class="btn btn-secondary btn-sm" href="' + esc(safeUrl(s.url(c)) || '#') + '" target="_blank" rel="noopener">' + esc(s.name) + ': “' + esc(c.kw) + '” ↗</a>').join(' ');
+  const next = overdue.length
+    ? { text: 'Follow up on <strong>' + esc(overdue[0].title || 'your overdue job') + '</strong>' + (overdue[0].company ? ' @ ' + esc(overdue[0].company) : '') + ' — it was due ' + esc(overdue[0].followUp) + '.', href: '#tracker', label: 'Go to tracker →' }
+    : savedOnly.length
+      ? { text: 'Apply to <strong>' + esc(savedOnly[0].title || 'a saved job') + '</strong>' + (savedOnly[0].company ? ' @ ' + esc(savedOnly[0].company) : '') + ' — saved jobs don’t count until you apply.', href: '#tracker', label: 'Apply next →' }
+      : { text: 'Search <strong>“' + esc(c.kw) + '”</strong> near ' + esc(c.loc) + ' and track 3 good postings.', href: '#find', label: 'Find jobs →' };
+  el.innerHTML =
+    '<div class="focus-grid">' +
+      '<div class="focus-tile ' + (overdue.length ? 'danger' : 'ok') + '"><h3>⚠ Follow-ups overdue</h3><p class="big">' + overdue.length + '</p><p>' + (overdue.length ? esc(overdue.slice(0, 3).map((a) => (a.title || 'Job') + (a.company ? ' @ ' + a.company : '')).join(' • ')) : 'Nothing overdue. Nice and clean.') + '</p></div>' +
+      '<div class="focus-tile ' + (dueSoon.length ? 'warn' : 'ok') + '"><h3>📅 Due in next 7 days</h3><p class="big">' + dueSoon.length + '</p><p>' + (dueSoon.length ? esc(dueSoon.slice(0, 3).map((a) => (a.title || 'Job') + ' (' + a.followUp + ')').join(' • ')) : 'No follow-ups coming up this week.') + '</p></div>' +
+      '<div class="focus-tile ' + (savedOnly.length ? 'warn' : 'ok') + '"><h3>📌 Saved, not applied</h3><p class="big">' + savedOnly.length + '</p><p>' + (stale.length ? stale.length + ' saved 14+ days ago — apply or archive them.' : savedOnly.length ? 'Pick the best one and apply today.' : 'Save postings with ＋ Track as you search.') + '</p></div>' +
+      '<div class="focus-tile ' + (backupDue ? 'warn' : 'ok') + '"><h3>🎯 Weekly goal & backup</h3><p class="big">' + (doneCount || 0) + ' / ' + (goalCount || 5) + '</p><p>' + (backupDue ? '⚠ No recent backup — use Backup (JSON) in My Tracker today.' : 'Applications in the last 7 days. Backups are up to date.') + '</p></div>' +
+    '</div>' +
+    '<div class="focus-next"><span>⚡ <strong>Next best action:</strong> ' + next.text + '</span><a class="btn btn-primary btn-sm" href="' + next.href + '">' + next.label + '</a>' + (quick ? '<span style="display:flex;gap:6px;flex-wrap:wrap">' + quick + '</span>' : '') + '</div>';
+  maybeNotify(overdue);
+}
+function maybeNotify(overdue) {
+  try {
+    if (!overdue.length || !('Notification' in window) || Notification.permission !== 'granted') return;
+    const key = 'sjf.v2.lastNotify';
+    if (localStorage.getItem(key) === todayISO()) return;
+    localStorage.setItem(key, todayISO());
+    new Notification('California Job Finder', { body: overdue.length + ' follow-up(s) overdue — open Today’s Focus to catch up.' });
+  } catch (e) { /* notifications are optional */ }
+}
+function parsePaste(text) {
+  const raw = String(text || ''); const out = {};
+  const urlMatch = raw.match(/https?:\/\/[^\s)]+/i); if (urlMatch) out.url = urlMatch[0].replace(/[.,;]+$/, '');
+  const lines = raw.split(/\r?\n/).map((s) => s.trim()).filter(Boolean);
+  const labeled = (names) => { for (const line of lines) { const m = line.match(new RegExp('^(' + names + ')\\s*[:\\-]\\s*(.+)$', 'i')); if (m) return m[2].trim(); } return ''; };
+  out.title = labeled('job title|title|position|role');
+  out.company = labeled('company|employer|organization|organisation');
+  out.location = labeled('location|city');
+  out.pay = labeled('pay|salary|compensation|wage|rate');
+  if (!out.pay) { const pm = raw.match(/\$\s?\d[\d,]*(?:\.\d{1,2})?(?:\s*[-–]\s*\$\s?\d[\d,]*(?:\.\d{1,2})?)?\s*(?:\/\s?hr|\/\s?hour|per hour|an hour|hourly|\/\s?yr|per year|annually)?/i); if (pm) out.pay = pm[0].replace(/\s+/g, ' ').trim(); }
+  if (!out.location) { const lm = raw.match(/([A-Za-z][A-Za-z .'-]+,\s*CA\s*\d{5})/); if (lm) out.location = lm[1]; }
+  if (!out.location && /\b(remote|work from home|work-from-home|wfh)\b/i.test(raw)) out.location = 'Remote';
+  const dm = raw.match(/(\d+(?:\.\d+)?)\s*(?:mi|miles?)\b/i); if (dm) out.distance = dm[1];
+  if (!out.company) { const cm = raw.match(/\b(?:at|@|—|–|-)\s+([A-Z][A-Za-z0-9&.' ]{2,40}?)(?:\s+(?:in|near)\s+|\s*[,•|]|$)/); if (cm && !out.title) { /* company only if not swallowing title */ } else if (cm) out.company = cm[1].trim(); }
+  if (!out.title) {
+    const dash = raw.match(/^(.{3,70}?)\s+(?:—|–|\||@)\s+/m);
+    const candidate = (dash && dash[1]) || lines.find((l) => l.length >= 3 && l.length <= 80 && !/^https?:/i.test(l) && !/apply|easy apply|job type|full[- ]time|part[- ]time/i.test(l));
+    if (candidate) out.title = candidate.trim();
+    if (out.title && out.url && /^https?:/i.test(out.title)) out.title = '';
+  }
+  if (!out.title && out.url) { try { const seg = new URL(out.url).pathname.split('/').filter(Boolean).pop() || ''; const human = decodeURIComponent(seg).replace(/\.(html?|aspx)$/i, '').replace(/[-_]+/g, ' ').replace(/\b\d+\b/g, '').trim(); if (human.length >= 3) out.title = titleCase(human).slice(0, 80); } catch (e) {} }
+  out.remote = /\b(remote|work from home|work-from-home|wfh)\b/i.test(raw);
+  return out;
+}
 
 /* ---------------- Form ---------------- */
 function resetForm() { $('#jobForm').reset(); $('#editId').value = ''; $('#fTransport').value = 'bus'; $('#fStatus').value = 'Saved'; $('#fPriority').value = 'Normal'; $('#formTitle').textContent = '＋ Add a job'; $('#submitBtn').textContent = '＋ Add job'; $('#cancelEditBtn').hidden = true; $('#jobForm').classList.remove('editing'); $('#formCarWarning').hidden = true; }
@@ -452,7 +519,7 @@ document.addEventListener('DOMContentLoaded', () => {
   function renderAdminListsSafe() { if (adminSession) renderAdminLists(); }
 
   /* setup */
-  $('#countySelect').addEventListener('change', (e) => { const oldSeat = countyObj(settings.county).seat; settings.county = e.target.value; const co = countyObj(settings.county); if (!settings.city || settings.city === oldSeat) settings.city = co.seat; applySettings(); });
+  $('#countySelect').addEventListener('change', (e) => { const oldSeat = countyObj(settings.county).seat; settings.county = e.target.value; const co = countyObj(settings.county); if (!settings.city || settings.city === oldSeat) { settings.city = co.seat; $('#cityInput').value = settings.city; } applySettings(); });
   $('#cityInput').addEventListener('input', (e) => { settings.city = e.target.value; applySettings(); });
   $('#zipInput').addEventListener('input', (e) => { settings.zip = e.target.value.replace(/\D/g, '').slice(0, 5); e.target.value = settings.zip; applySettings(); });
   $('#useSeatBtn').addEventListener('click', () => { settings.city = countyObj(settings.county).seat; $('#cityInput').value = settings.city; applySettings(); $('#zipInput').focus(); });
@@ -486,13 +553,44 @@ document.addEventListener('DOMContentLoaded', () => {
   $('#jobForm').addEventListener('submit', (e) => {
     e.preventDefault(); const title = $('#fTitle').value.trim(); if (!title) { alert('Please add a job title first.'); $('#fTitle').focus(); return; }
     const data = { title, company: $('#fCompany').value.trim(), location: $('#fLocation').value.trim(), distance: $('#fDistance').value === '' ? '' : Number($('#fDistance').value), pay: $('#fPay').value.trim(), transport: $('#fTransport').value, url: $('#fUrl').value.trim(), status: $('#fStatus').value, priority: $('#fPriority').value, dateApplied: $('#fApplied').value, followUp: $('#fFollow').value, contact: $('#fContact').value.trim(), notes: $('#fNotes').value.trim() };
+    /* Automations: auto follow-up (+7 days), auto status, duplicate warning */
+    if (data.dateApplied && !data.followUp) data.followUp = addDaysISO(data.dateApplied, 7);
+    if (data.dateApplied && data.status === 'Saved') data.status = 'Applied';
     const editId = $('#editId').value;
+    const norm = (s) => String(s || '').toLowerCase().replace(/[^a-z0-9]+/g, ' ').trim();
+    const dupe = apps.find((a) => String(a.id) !== String(editId) && norm(a.title) === norm(data.title) && norm(a.company) === norm(data.company) && norm(a.company) !== '');
+    if (dupe && !confirm('This looks like a duplicate of “' + dupe.title + '”' + (dupe.company ? ' @ ' + dupe.company : '') + ' already in your tracker. Save it anyway?')) return;
     if (editId) { const i = apps.findIndex((a) => String(a.id) === String(editId)); if (i >= 0) apps[i] = Object.assign({}, apps[i], data); }
     else apps.unshift(Object.assign({ id: String(Date.now()) + '-' + Math.random().toString(36).slice(2, 7), createdAt: Date.now() }, data));
     persistApps(); renderApps(); resetForm();
   });
   $('#cancelEditBtn').addEventListener('click', resetForm);
   ['fLocation','fDistance','fTransport'].forEach((id) => { $('#' + id).addEventListener('input', updateFormWarning); $('#' + id).addEventListener('change', updateFormWarning); });
+  /* Automation: picking a Date Applied auto-suggests a follow-up 7 days later */
+  $('#fApplied').addEventListener('change', (e) => { if (e.target.value && !$('#fFollow').value) $('#fFollow').value = addDaysISO(e.target.value, 7); });
+  /* Automation: Smart Paste auto-fill */
+  $('#autofillBtn').addEventListener('click', () => {
+    const parsed = parsePaste($('#pasteText').value);
+    if (!Object.keys(parsed).length || (!parsed.title && !parsed.url)) { alert('Could not detect a job in that paste. Try pasting the posting text (title, company, location, pay) or its link.'); return; }
+    if (parsed.title) $('#fTitle').value = parsed.title;
+    if (parsed.company) $('#fCompany').value = parsed.company;
+    if (parsed.location) $('#fLocation').value = parsed.location;
+    if (parsed.distance) $('#fDistance').value = parsed.distance;
+    if (parsed.pay) $('#fPay').value = parsed.pay;
+    if (parsed.url) $('#fUrl').value = parsed.url;
+    if (parsed.remote) { $('#fTransport').value = 'remote'; if (!parsed.location) $('#fLocation').value = 'Remote'; }
+    updateFormWarning();
+    $('#fTitle').focus();
+  });
+  /* Automation: due-date browser reminders (only while this page can ask/show them) */
+  $('#notifyBtn').addEventListener('click', async () => {
+    if (!('Notification' in window)) { alert('This browser does not support notifications. The red overdue counters still work without them.'); return; }
+    try {
+      const perm = await Notification.requestPermission();
+      if (perm === 'granted') { localStorage.removeItem('sjf.v2.lastNotify'); renderApps(); alert('Reminders on: while this page is open, you’ll get a daily nudge when follow-ups are overdue.'); }
+      else alert('Notifications were not allowed. You can enable them later in your browser’s site settings.');
+    } catch (e) { alert('Could not enable notifications in this browser.'); }
+  });
 
   $('#trackerResults').addEventListener('change', (e) => { const sel = e.target.closest('[data-status]'); if (!sel) return; const a = apps.find((x) => String(x.id) === String(sel.dataset.status)); if (a) { a.status = sel.value; persistApps(); renderApps(); } });
   $('#trackerResults').addEventListener('click', (e) => {
@@ -504,7 +602,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
   /* exports / restore */
   $('#exportCsvBtn').addEventListener('click', () => { if (!apps.length) { alert('No tracked jobs yet.'); return; } const head = ['Job Title','Company','Location','Distance (miles)','Pay','How I’d get there','Job Posting URL','Status','Priority','Date Applied','Follow-up Date','Contact','Notes','Profile','County','City','ZIP']; const rows = apps.map((a) => [a.title,a.company,a.location,a.distance,a.pay,(TRANSPORT_TAGS[a.transport]||{}).tag || a.transport,a.url,a.status,a.priority,a.dateApplied,a.followUp,a.contact,a.notes,(activeProfile()||{}).name,settings.county,settings.city,settings.zip].map(csvCell).join(',')); download('california-job-applications.csv', [head.map(csvCell).join(',')].concat(rows).join('\r\n'), 'text/csv;charset=utf-8'); });
-  $('#backupBtn').addEventListener('click', () => download('california-job-finder-backup-' + todayISO() + '.json', JSON.stringify(gatherAll(), null, 2), 'application/json'));
+  $('#backupBtn').addEventListener('click', () => { download('california-job-finder-backup-' + todayISO() + '.json', JSON.stringify(gatherAll(), null, 2), 'application/json'); markBackup(); renderApps(); });
   $('#restoreInput').addEventListener('change', (e) => { const f = e.target.files && e.target.files[0]; if (!f) return; const r = new FileReader(); r.onload = () => { try { const data = JSON.parse(String(r.result || '')); if (!confirm('Restore this backup? It replaces the data described in the file.')) return; if (!restoreData(data)) throw new Error('Unrecognized backup file.'); alert('Backup restored.'); } catch (err) { alert('Could not restore: ' + err.message); } }; r.readAsText(f); e.target.value = ''; });
 
   /* weekly */

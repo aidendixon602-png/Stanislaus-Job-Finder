@@ -21,6 +21,14 @@ A standalone, one-page job-search website that started in **Modesto, CA 95355 (S
 - **🇪🇸 + ♿ EN/ES + accessibility** — Spanish toggle for the main interface (headings, controls, stats, checklist), **A+ large-text** and **◐ high-contrast** toggles, all saved as display preferences.
 - **🔐 Encrypted Admin** — see below.
 
+## New in v3 — Professional design + automations
+
+- **🎨 Professional redesign** — branded hero (inline SVG logo mark, no external images), trust badges (Free / No sign-up / 58 counties / Offline / Private), deeper navy-teal-gold theme, pill buttons, hover-lift cards, and an auto-save indicator (“✓ Auto-saved on this device at …”) so users always know their work is safe.
+- **⚡ Today’s Focus (AUTO)** — a dashboard auto-built from your tracker: overdue follow-ups, due-in-7-days, saved-but-not-applied (with 14-day stale flags), weekly-goal + backup health, a “Next best action,” and one-click quick searches. Updates instantly on every change.
+- **✨ Smart Paste** — paste a posting (or its link) into My Tracker and auto-fill title, company, location/ZIP, pay, distance, URL, and Remote detection. Nothing is scraped from the web; it parses what *you* paste.
+- **🤖 Tracker automations** — choosing Date Applied auto-sets a follow-up 7 days later and moves Saved → Applied; duplicate title+company saves warn first; exports stamp a backup timestamp; backup reminders appear when you have 3+ jobs and no backup in 14 days.
+- **🔔 Due-date reminders** — optional browser notifications (permission-based, once per day while the page is open). True background/email/SMS reminders while the site is closed would require a small backend (e.g. Cloudflare Worker + database) — that is intentionally *not* faked here.
+
 ## Who it's for
 
 Any California job seeker — especially without a car. Set transport once (🚫🚗 No car = 5 mi + remote · 🚶 Walk/bike = 3 mi · 🚌 Transit = 10 mi · 🚗 Car = 25 mi) and the recommendation order stays: 🏠 remote first → 🚶 your ZIP/neighborhood → 🚌 transit-friendly → 🚗 far jobs auto-flagged “Usually needs a car” (distance-based everywhere; the classic Stanislaus far-city list — Turlock, Riverbank, Oakdale, Salida, Stockton — is kept when Stanislaus is selected). Entry-level chips cover retail/cashier, grocery, food service, warehouse, janitor, caregiver, call center, security, general labor, remote customer service/data entry, and delivery driving (with its 🚗 warning).
