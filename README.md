@@ -1,79 +1,75 @@
-# Stanislaus Job Finder
+# Stanislaus Job Finder — now California Job Finder (58-County Edition)
 
-A standalone, one-page job-search website for **Modesto, CA 95355 (Stanislaus County)** — built for job seekers **without a car**. Open it, click live searches, track every application in one private place.
+A standalone, one-page job-search website that started in **Modesto, CA 95355 (Stanislaus County)** and now works for **anyone in California**: pick any of the **58 counties**, your city and ZIP, and every live search, county resource, and transit link rebuilds for your location.
 
-**No account, no sign-up, no backend, no database server.** Everything you save lives only in your browser's `localStorage`, on your device.
+**No account, no sign-up, no backend, no database server.** Everything is saved privately in your browser's `localStorage`, per profile, on your device.
 
-> This is its **own separate project/repo** (`Stanislaus-Job-Finder`). It is not part of any Discord bot or other project.
+> Its **own separate project/repo** (`Stanislaus-Job-Finder`) — not part of any Discord bot or other project.
 
 ## Quick start
 
-- **Easiest:** double-click **`index.html`** — it works offline, straight from the folder. No internet is needed for the page itself (you'll need internet only when you click out to a job site).
-- **Optional local server:** `npm start` (runs `node serve.mjs`, no dependencies to install) → <http://localhost:4173>
+- **Easiest:** double-click **`index.html`** — works offline; internet is only needed when you click out to a job site.
+- **Optional server:** `npm start` (`node serve.mjs`, zero dependencies) → <http://localhost:4173>
+
+## New in the 58-County Edition
+
+- **🌎 All 58 California counties** — county picker (with county seat + known transit agency, e.g. LA Metro, VTA, SacRT, San Joaquin RTD, StanRTA…), city + ZIP fields that re-center *every* search (Indeed `l={zip}`, ZipRecruiter, LinkedIn, CalJOBS, etc.). Stanislaus / Modesto 95355 remains the default, and v1 data on this browser **auto-imports** into the first profile.
+- **👥 Multiple profiles** — profile switcher in the header; each profile (person, client, family member) gets its own settings, tracker, saved searches, readiness checklist, and weekly plan on the same computer. Add / rename / delete profiles in ⚙ My Setup.
+- **🏛️ My County Resources** — per-county cards: official county-jobs search, government jobs near you, county workforce / America's Job Center (AJCC) finder, transit trip checker (StanRTA special-cased for Stanislaus), and EdJoin school jobs. Help section re-targets to your county too.
+- **⭐ Smarter searching** — favorite sites (☆ on any card + favorites-only filter), **saved searches**, a dynamic “Start here” six (remote searches surface remote boards automatically), and a job-ready checklist (resume, documents, voicemail, transport plan…) with progress.
+- **🗂️ Pro tracker** — List **and Board (kanban-by-status)** views, sorting (newest / follow-up / priority / distance), weekly application **goal meter**, funnel insights (applied → interview rate, due-in-7-days), duplicate-a-job, CSV export with profile/county columns.
+- **🇪🇸 + ♿ EN/ES + accessibility** — Spanish toggle for the main interface (headings, controls, stats, checklist), **A+ large-text** and **◐ high-contrast** toggles, all saved as display preferences.
+- **🔐 Encrypted Admin** — see below.
 
 ## Who it's for
 
-A Modesto 95355 job seeker with **no car**, looking for **any entry-level work**: retail, cashier, grocery stocker, food service / fast food, warehouse associate, general labor, janitor/cleaner, caregiver, security guard, call center, and remote customer service / data entry.
+Any California job seeker — especially without a car. Set transport once (🚫🚗 No car = 5 mi + remote · 🚶 Walk/bike = 3 mi · 🚌 Transit = 10 mi · 🚗 Car = 25 mi) and the recommendation order stays: 🏠 remote first → 🚶 your ZIP/neighborhood → 🚌 transit-friendly → 🚗 far jobs auto-flagged “Usually needs a car” (distance-based everywhere; the classic Stanislaus far-city list — Turlock, Riverbank, Oakdale, Salida, Stockton — is kept when Stanislaus is selected). Entry-level chips cover retail/cashier, grocery, food service, warehouse, janitor, caregiver, call center, security, general labor, remote customer service/data entry, and delivery driving (with its 🚗 warning).
 
-Search priority is built in:
+## 🔐 Admin (Encrypted)
 
-1. 🏠 **Remote / work-from-home first**
-2. 🚶 **95355 / east Modesto** (walk/bike distance)
-3. 🚌 **Bus-friendly Modesto & Ceres** — Stanislaus Regional Transit (**StanRTA**, [stanrta.org](https://www.stanrta.org/)) info plus a **“Check bus route”** button (Google Maps transit directions) on the page and on tracked jobs
-4. 🚗 **Turlock, Riverbank, Oakdale, Salida, or Stockton** are automatically tagged **“🚗 Usually needs a car”** in the tracker so you don't waste time on them
+Scroll to **🔐 Admin (Encrypted)** at the bottom (or the Admin button in the header).
+
+- **Real encryption, not a fake lock:** first visit creates a vault — your password derives an **AES-256-GCM** key via **PBKDF2-SHA256 (310,000 iterations)** with a random salt (Web Crypto API). localStorage stores only `{salt, iv, ciphertext}`. The password and the key are **never stored**; the key lives only in memory while unlocked and is wiped on lock / after **10 minutes** auto-lock. A wrong password cannot decrypt (GCM authentication fails).
+- **While unlocked, admin can:** set a top **announcement banner** for everyone; keep **private encrypted notes** (only ever saved as ciphertext); **add custom job sites** with `{keyword} {city} {zip} {county} {radius}` URL placeholders; **show/hide built-in sites**; pin a **per-county note** into My County Resources; **change the password** (re-encrypts); view **diagnostics** (profiles, storage use); make an **encrypted full backup** (password-protected file) and restore it; and use the danger zone (erase profile / erase everything / delete vault).
+- **Forgot the password?** There is no reset by design — delete the vault in Admin and create a new one.
+- **Honest limits:** encryption protects the vault/private notes *at rest on this device* and stops casual snooping. With no server, it can't stop someone with full developer access from editing the public page on that device. Locking the whole organization behind real accounts requires a backend deployment — don't oversell this to compliance.
 
 ## How searching works (no fake listings)
 
-Nothing is scraped and **no job listings are invented or copied** — a copied list goes stale. Instead, every site button builds a **live search URL** pre-filled with *your keyword + Modesto, CA 95355* (e.g. Indeed: `https://www.indeed.com/jobs?q={keyword}&l=95355&radius={radius}&sort=date`, plus LinkedIn, ZipRecruiter, Glassdoor, Monster, CareerBuilder, USAJobs, GovernmentJobs, and a Google Jobs search for `"{keyword} jobs near Modesto, CA 95355"`).
-
-The radius follows your transport choice:
-
-| Transport choice | Search radius |
-|---|---|
-| 🚫🚗 No car (default) | 5 miles **+ remote** |
-| 🚶 Walk / bike only | 3 miles |
-| 🚌 Bus (StanRTA) | 10 miles |
-| 🚗 Have a car | 25 miles |
-
-Type a job (or tap a chip — Any entry-level, Remote Customer Service, Remote Data Entry, Retail/Cashier, Grocery Stocker, Food Service, Warehouse, Janitor, Caregiver, Call Center, Security Guard, General Labor, Delivery Driver 🚗) and **every button on the page updates instantly**. A filter box narrows the site directory.
+Nothing is scraped and **no listings are invented** — a copied list goes stale. Every Search button builds a **live URL** for *your keyword + your city/ZIP* (Indeed, LinkedIn, ZipRecruiter, Glassdoor, Monster, CareerBuilder, USAJobs, GovernmentJobs, CalJOBS, Google Jobs `"{keyword} jobs near {city}, CA {zip}"`, and 50+ more below, plus any admin-added sites).
 
 ## Job sources
 
-Sites come from the Stanislaus County Workforce Development guide, [“Job Search Website Resources” (PDF)](https://stanworkforce.com/media/zonmxzhn/job-search-website-resources.pdf), organized in the on-page directory:
+Directory built from the Stanislaus County Workforce Development guide, [“Job Search Website Resources” (PDF)](https://stanworkforce.com/media/zonmxzhn/job-search-website-resources.pdf), expanded statewide:
 
-1. **Big job boards** — Indeed, Monster, CareerBuilder, ZipRecruiter, Google Jobs, LinkedIn, Glassdoor, SimplyHired, Snagajob (hourly work), Getwork, iHire, Nexxt, The Muse
-2. **Local & government** — [CalJOBS](https://www.caljobs.ca.gov/), CalCareers, USAJobs, GovernmentJobs.com, Stanislaus County jobs, City of Modesto jobs, [Stanislaus Workforce](https://www.stanworkforce.com/), EdJoin (school jobs)
-3. **Direct employers** (employers post on their *own* sites first because it's free — Workforce guide) — Sutter Health, Kaiser Permanente, Walmart, Target, Amazon, Save Mart, Robert Half
+1. **Big job boards** — Indeed, Monster, CareerBuilder, ZipRecruiter, Google Jobs, LinkedIn, Glassdoor, SimplyHired, Snagajob, Getwork, iHire, Nexxt, The Muse
+2. **California, county & government** — CalJOBS, CalCareers, USAJobs, GovernmentJobs.com, county government jobs, EdJoin, CareerOneStop/AJCC finder, CA EDD
+3. **Direct employers** (they post on their own sites first — it's free) — Sutter Health, Kaiser Permanente, Walmart, Target, Amazon, Save Mart, Robert Half
 4. **Remote & freelance** — FlexJobs, We Work Remotely, Remote.co, Upwork, Fiverr
-5. **Specialty/niche** (from the PDF) — Dice (tech), Idealist (nonprofits), HigherEdJobs, ConstructionJobs, JobsInLogistics, and more
-6. **Veterans** (from the PDF) — Hire Heroes USA, RecruitMilitary, VetJobs, GI Jobs
-7. **Retirees / 50+** (from the PDF) — AARP Jobs, RetirementJobs, Workforce50, WAHVE
+5. **Specialty/niche** — Dice, Idealist, HigherEdJobs, ConstructionJobs, JobsInLogistics, Call Center Jobs, Poached, SalesGravy, Mediabistro, Behance
+6. **Veterans** — Hire Heroes USA, RecruitMilitary, VetJobs, GI Jobs
+7. **Retirees / 50+** — AARP Jobs, RetirementJobs, Workforce50, WAHVE
+8. **Added by Admin** — custom sites your local admin adds
 
-## Features
+## Tracker recap
 
-- **Setup that drives everything** — transport dropdown (default *No car*), work type (full-time / part-time / remote / any), a job field + clickable chips
-- **＋ Track on every site card** + a manual **Add a job** form: title, company, location, distance (miles), pay, how you'd get there (🏠/🚶/🚌/🚗), posting URL, status, priority (Low/Normal/High), date applied, follow-up date, contact, notes
-- **Application tracker** — statuses **Saved → Applied → Interview → Offer**, plus Rejected and Archived; change status from a dropdown on each card, edit, delete, and search/filter by text, status, and transport
-- **Stats bar** — total tracked, applied, interviews, offers, and **follow-ups overdue** (highlighted red in the hero and on the card)
-- **Export CSV**, **Backup/Restore (JSON)** for everything, and a **printable Weekly Plan** (Mon–Sun checklist whose checkboxes save automatically; Print styles show just the plan on paper)
-- **Free local help + safety** — Stanislaus Workforce Development and CalJOBS, plus a scam warning: real employers never ask you to pay, buy gift cards, or cash checks to get hired
+＋ Track on any card (or the Add-a-job form): title, company, location, distance, pay, transport (🏠/🚶/🚌/🚗), posting URL, status **Saved → Applied → Interview → Offer** (+ Rejected / Archived), priority, dates, contact, notes. Hero stats count totals/applied/interviews/offers, with **overdue follow-ups in red**; filters by text/status/transport; **Export CSV**, **Backup all (JSON)** / restore, and the Mon–Sun **printable Weekly Plan**.
 
 ## Files
 
 | File | What it is |
 |---|---|
-| `index.html` | The whole one-page site (hero + stats, no-car advice, Find Jobs, Tracker, Directory, Weekly Plan, help) |
-| `styles.css` | Plain CSS — system fonts only, no external fonts/images/CDNs; mobile-friendly + print styles |
-| `app.js` | Vanilla JavaScript — live search-URL builders, localStorage tracker, stats, CSV/JSON, weekly plan |
-| `serve.mjs` | Optional tiny Node static server (no dependencies), port **4173**, bound to `0.0.0.0` |
+| `index.html` | The one-page site (hero/stats, setup+profiles, find, tracker, county resources, directory, weekly, help, encrypted admin) |
+| `styles.css` | Plain CSS — system fonts, no external assets; responsive, large-text/high-contrast modes, print styles |
+| `app.js` | Vanilla JS — 58-county engine, profiles, live URL builders, tracker, i18n, Web Crypto admin vault |
+| `serve.mjs` | Optional zero-dependency Node server, port **4173**, `0.0.0.0` |
 | `package.json` | `"start": "node serve.mjs"` |
-| `Stanislaus-Job-Finder.zip` | Downloadable copy of these root files, ready to upload to your own GitHub repo |
+| `Stanislaus-Job-Finder.zip` | Downloadable copy of these root files |
 
-## Privacy & data
+## Privacy & data keys
 
-- Data keys: `sjf.settings.v1`, `sjf.apps.v1`, `sjf.utils.v1` in this browser's `localStorage` for this file/site origin.
-- Nothing is sent anywhere. Clearing browser data (or using a different browser/computer) will not show your tracker — **use Backup (JSON) regularly** and keep the file somewhere safe.
+`localStorage`: `sjf.v2.meta` (profiles), `sjf.v2.<profileId>.{settings,apps,week}`, `sjf.v2.public` (banner/custom sites/visibility/county notes — set only through the unlocked admin UI), `sjf.v2.prefs` (language/display), `sjf.v2.adminVault` (ciphertext only). v1 keys (`sjf.settings.v1` etc.) are read once for migration and left untouched. The encrypted backup excludes nothing public, but regular backups never contain your admin password or decrypted notes. Nothing is sent anywhere.
 
 ## Tech
 
-Plain HTML + CSS + vanilla JavaScript only. No build step, no frameworks, no npm dependencies (the optional server uses only Node's built-in modules). Works by double-clicking `index.html`.
+Plain HTML + CSS + vanilla JavaScript, Web Crypto API, `localStorage`. No build step, no frameworks, no npm dependencies (optional server = Node built-ins only). Admin encryption needs a current browser with Web Crypto (all modern browsers on HTTPS pages and local files).

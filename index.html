@@ -3,35 +3,51 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Stanislaus Job Finder — Jobs near Modesto, CA 95355</title>
-<meta name="description" content="Find entry-level jobs near Modesto, CA 95355. Remote first, then walk/bike and bus-friendly jobs for Stanislaus County. Track every application privately in your browser.">
+<title>Stanislaus Job Finder — California Job Finder for Every County</title>
+<meta name="description" content="Find jobs anywhere in California: pick any of the 58 counties, your city and ZIP. Remote-first, walk/bike and transit-friendly searching with a private multi-profile application tracker and an encrypted admin vault.">
 <link rel="stylesheet" href="styles.css">
 </head>
 <body>
-<a class="skip-link" href="#find">Skip to job search</a>
+<a class="skip-link" href="#setup">Skip to setup</a>
+<div class="admin-banner" id="adminBanner" hidden></div>
 
 <header class="hero">
   <div class="wrap">
-    <p class="eyebrow">📍 Stanislaus County &nbsp;•&nbsp; Modesto, CA 95355 &nbsp;•&nbsp; No car? Start remote.</p>
-    <h1>Stanislaus Job Finder</h1>
-    <p class="lede">Find real, live job openings — remote first, then walk/bike distance, then bus-friendly in Modesto &amp; Ceres. Track every application in one private place. No account, no sign-up: everything is saved only in <strong>this browser</strong> (localStorage).</p>
+    <div class="topbar">
+      <p class="eyebrow">📍 California • <span id="heroLocation">Stanislaus County • Modesto, CA 95355</span></p>
+      <div class="pref-tools" aria-label="Display and language tools">
+        <label class="profile-mini"><span data-i18n="profile">Profile</span>
+          <select id="profileSelect" aria-label="Active profile"></select>
+        </label>
+        <button type="button" class="tool-btn" id="newProfileBtn">＋ <span data-i18n="newProfile">New profile</span></button>
+        <button type="button" class="tool-btn" id="langToggle" aria-label="Cambiar a español / Switch language">🇪🇸 ES</button>
+        <button type="button" class="tool-btn" id="fontToggle" aria-pressed="false">A+ <span data-i18n="largeText">Large text</span></button>
+        <button type="button" class="tool-btn" id="contrastToggle" aria-pressed="false">◐ <span data-i18n="contrast">Contrast</span></button>
+        <a class="tool-btn tool-link" href="#admin">🔐 <span data-i18n="admin">Admin</span></a>
+      </div>
+    </div>
+
+    <h1 data-i18n="heroTitle">California Job Finder</h1>
+    <p class="lede" data-i18n="heroLede">Built in Stanislaus County, now for anyone in California. Pick your county, city and ZIP — remote first, then walk/bike, then transit-friendly. Track every application privately on this device. No account, no sign-up.</p>
 
     <div class="stats-bar" role="region" aria-label="Your application stats">
-      <div class="stat"><span class="stat-num" id="statTotal">0</span><span class="stat-label">Total tracked</span></div>
-      <div class="stat"><span class="stat-num" id="statApplied">0</span><span class="stat-label">Applied</span></div>
-      <div class="stat"><span class="stat-num" id="statInterviews">0</span><span class="stat-label">Interviews</span></div>
-      <div class="stat"><span class="stat-num" id="statOffers">0</span><span class="stat-label">Offers</span></div>
-      <div class="stat stat-danger" id="statOverdueBox"><span class="stat-num" id="statOverdue">0</span><span class="stat-label">⚠ Follow-ups overdue</span></div>
+      <div class="stat"><span class="stat-num" id="statTotal">0</span><span class="stat-label" data-i18n="totalTracked">Total tracked</span></div>
+      <div class="stat"><span class="stat-num" id="statApplied">0</span><span class="stat-label" data-i18n="applied">Applied</span></div>
+      <div class="stat"><span class="stat-num" id="statInterviews">0</span><span class="stat-label" data-i18n="interviews">Interviews</span></div>
+      <div class="stat"><span class="stat-num" id="statOffers">0</span><span class="stat-label" data-i18n="offers">Offers</span></div>
+      <div class="stat stat-danger" id="statOverdueBox"><span class="stat-num" id="statOverdue">0</span><span class="stat-label">⚠ <span data-i18n="overdue">Follow-ups overdue</span></span></div>
     </div>
 
     <nav class="hero-nav" aria-label="Page sections">
-      <a href="#find">🔎 Find Jobs</a>
-      <a href="#tracker">🗂️ My Tracker</a>
-      <a href="#directory">🌐 Job Sites Directory</a>
-      <a href="#weekly">🗓️ Weekly Plan</a>
-      <a href="#help">🆘 Free Local Help</a>
+      <a href="#setup">⚙️ <span data-i18n="navSetup">My Setup</span></a>
+      <a href="#find">🔎 <span data-i18n="navFind">Find Jobs</span></a>
+      <a href="#tracker">🗂️ <span data-i18n="navTracker">My Tracker</span></a>
+      <a href="#county">🏛️ <span data-i18n="navCounty">My County</span></a>
+      <a href="#directory">🌐 <span data-i18n="navDirectory">Job Sites</span></a>
+      <a href="#weekly">🗓️ <span data-i18n="navWeekly">Weekly Plan</span></a>
+      <a href="#help">🆘 <span data-i18n="navHelp">Free Help</span></a>
     </nav>
-    <p class="hero-note">🔒 Private by design: no backend, no database server, no account. Clearing your browser data will erase your tracker — use <a href="#tracker">Backup (JSON)</a> in My Tracker to keep a copy.</p>
+    <p class="hero-note">🔒 <span data-i18n="heroNote">Private by design: profiles, applications and settings are saved only in this browser. Use Backup regularly — clearing browser data erases this device's copy.</span></p>
   </div>
 </header>
 
@@ -40,59 +56,92 @@
   <!-- ======================= RECOMMENDED ======================= -->
   <section class="card advice" id="recommend" aria-labelledby="recTitle">
     <h2 id="recTitle">⭐ Recommended for you: no car</h2>
-    <p id="recIntro">Because you don’t have a car, search in this order so you don’t waste time on jobs you can’t get to:</p>
+    <p id="recIntro">Search in this order so you don’t waste time on jobs you can’t get to:</p>
     <ol class="priority-list">
-      <li><span class="tag tag-remote">🏠 Remote</span> <strong>Remote / work-from-home first.</strong> Use the “Remote Customer Service” and “Remote Data Entry” chips below — zero commute, apply from home.</li>
-      <li><span class="tag tag-walk">🚶 Walk/bike</span> <strong>95355 / east Modesto next.</strong> Jobs within about 3 miles you can walk or bike to. Check the distance on every listing before you apply.</li>
-      <li><span class="tag tag-bus">🚌 Bus-friendly</span> <strong>Bus-friendly Modesto &amp; Ceres.</strong> Stanislaus Regional Transit (<strong>StanRTA</strong>, formerly Modesto Area Express / MAX) runs Modesto city buses and county routes to Ceres and other cities. Plan the trip <em>before</em> you apply — and again before any interview.</li>
-      <li><span class="tag tag-car">🚗 Usually needs a car</span> <strong>Turlock, Riverbank, Oakdale, Salida, or Stockton.</strong> The tracker tags these automatically so you can skip them unless you have a ride lined up.</li>
+      <li><span class="tag tag-remote">🏠 Remote</span> <strong data-i18n="rec1t">Remote / work-from-home first.</strong> <span data-i18n="rec1">Zero commute — try the Remote Customer Service and Remote Data Entry chips below.</span></li>
+      <li><span class="tag tag-walk">🚶 Walk/bike</span> <strong id="recLocalTitle">Your ZIP / neighborhood next.</strong> <span data-i18n="rec2">Jobs within about 3 miles you can walk or bike to. Check the distance on every listing.</span></li>
+      <li><span class="tag tag-bus">🚌 Bus-friendly</span> <strong id="recTransitTitle">Transit-friendly jobs in your city & county.</strong> <span id="recTransitText">Plan the trip before you apply — and again before any interview.</span></li>
+      <li><span class="tag tag-car">🚗 Usually needs a car</span> <strong data-i18n="rec4t">Farther cities & long distances.</strong> <span data-i18n="rec4">The tracker flags long-distance jobs automatically so you can skip them unless you have a ride.</span></li>
     </ol>
     <div class="bus-box">
       <div>
-        <h3>🚌 Stanislaus Regional Transit (StanRTA)</h3>
-        <p>Modesto city buses + county routes (Modesto ⇄ Ceres and more). Check schedules, fares, and trip planning at <a href="https://www.stanrta.org/" target="_blank" rel="noopener">stanrta.org</a>. Stanislaus Workforce / America’s Job Center can also help you plan a work trip — see <a href="#help">Free Local Help</a>.</p>
+        <h3 id="transitBoxTitle">🚌 Stanislaus Regional Transit (StanRTA)</h3>
+        <p id="transitBoxText">Modesto city buses + county routes (Modesto ⇄ Ceres and more). Check schedules and fares at <a href="https://www.stanrta.org/" target="_blank" rel="noopener">stanrta.org</a>.</p>
       </div>
-      <a class="btn btn-bus" id="busRouteBtn" href="https://www.google.com/maps/dir/?api=1&amp;origin=Modesto%2C+CA+95355&amp;destination=Modesto%2C+CA&amp;travelmode=transit" target="_blank" rel="noopener">🗺️ Check bus route</a>
+      <a class="btn btn-bus" id="busRouteBtn" href="https://www.google.com/maps/dir/?api=1&amp;origin=Modesto%2C+CA+95355&amp;destination=Modesto%2C+CA&amp;travelmode=transit" target="_blank" rel="noopener">🗺️ <span data-i18n="checkBus">Check bus route</span></a>
     </div>
-    <p class="small muted">Tip: on Google Maps, tap <strong>Directions → 🚍 Transit</strong>, set your home as the start and the employer address as the destination, and check both the trip <em>to</em> work and the trip <em>back</em> at your actual shift times (early/late buses run less often).</p>
   </section>
 
-  <!-- ======================= FIND JOBS ======================= -->
-  <section class="card" id="find" aria-labelledby="findTitle">
-    <h2 id="findTitle">🔎 Find Jobs</h2>
-    <p class="muted">Pick how you’ll get to work and what job you want. <strong>Every site button on this page instantly rebuilds</strong> into a live search for that job near <strong>Modesto, CA 95355</strong>. Nothing here is a copied list — you always land on the site’s real, current results. Nothing is scraped and no listings are made up.</p>
+  <!-- ======================= SETUP / PROFILE ======================= -->
+  <section class="card" id="setup" aria-labelledby="setupTitle">
+    <h2 id="setupTitle">⚙️ <span data-i18n="setupTitle">My Setup — works for anyone in California</span></h2>
+    <p class="muted" data-i18n="setupIntro">Set your county, city and ZIP once. Every search button, county resource and transit link on this page rebuilds for your location. Stanislaus / Modesto 95355 is the starting example — change it to yours.</p>
 
-    <div class="controls-grid">
+    <div class="profile-actions">
+      <p>👤 <strong data-i18n="activeProfile">Active profile:</strong> <span id="activeProfileName">—</span>
+      <span class="muted small" data-i18n="profileHint">(each profile has its own tracker, settings and weekly plan — great for families & job centers)</span></p>
+      <div class="toolbar">
+        <button type="button" class="btn btn-secondary btn-sm" id="renameProfileBtn">✏ <span data-i18n="rename">Rename</span></button>
+        <button type="button" class="btn btn-danger btn-sm" id="deleteProfileBtn">🗑 <span data-i18n="deleteProfile">Delete profile</span></button>
+      </div>
+    </div>
+
+    <div class="controls-grid location-grid">
       <div class="field">
-        <label for="transportSelect">How I’ll get to work</label>
+        <label for="countySelect" data-i18n="county">County (all 58 in California)</label>
+        <select id="countySelect"></select>
+        <p class="field-hint" id="countyHint"></p>
+      </div>
+      <div class="field">
+        <label for="cityInput" data-i18n="city">City</label>
+        <input type="text" id="cityInput" value="Modesto" autocomplete="address-level2">
+        <p class="field-hint"><button type="button" class="link-btn" id="useSeatBtn">⌖ <span data-i18n="useSeat">Use county seat</span></button></p>
+      </div>
+      <div class="field">
+        <label for="zipInput">ZIP code</label>
+        <input type="text" id="zipInput" value="95355" inputmode="numeric" maxlength="5" autocomplete="postal-code" placeholder="e.g. 95355">
+        <p class="field-hint" data-i18n="zipHint">Your 5-digit ZIP centers every radius search.</p>
+      </div>
+      <div class="field">
+        <label for="transportSelect" data-i18n="transport">How I’ll get to work</label>
         <select id="transportSelect">
           <option value="nocar" selected>🚫🚗 No car — remote + nearby (5 miles)</option>
           <option value="walkbike">🚶 Walk / bike only (3 miles)</option>
-          <option value="bus">🚌 Bus — StanRTA (10 miles)</option>
+          <option value="bus">🚌 Bus / transit (10 miles)</option>
           <option value="car">🚗 Have a car (25 miles)</option>
         </select>
         <p class="field-hint" id="radiusHint">Search radius: <strong>5 miles</strong> + remote jobs.</p>
       </div>
-
       <div class="field">
-        <label for="workTypeSelect">Work type</label>
+        <label for="workTypeSelect" data-i18n="workType">Work type</label>
         <select id="workTypeSelect">
           <option value="any" selected>Any work type</option>
           <option value="fulltime">Full-time</option>
           <option value="parttime">Part-time</option>
           <option value="remote">Remote / work from home</option>
         </select>
-        <p class="field-hint">Added as a filter on the big boards that support it.</p>
+        <p class="field-hint" data-i18n="workTypeHint">Added as a filter on the big boards that support it.</p>
       </div>
-
-      <div class="field field-wide">
-        <label for="keywordInput">Job I’m looking for</label>
-        <input type="text" id="keywordInput" placeholder="e.g. warehouse associate" value="entry level" autocomplete="off">
-        <p class="field-hint">Typing updates every search button below, instantly.</p>
+      <div class="field">
+        <label for="experienceSelect" data-i18n="experience">Experience level</label>
+        <select id="experienceSelect">
+          <option value="entry" selected>Entry-level / first job</option>
+          <option value="some">Some experience</option>
+          <option value="experienced">Experienced</option>
+          <option value="student">Student</option>
+          <option value="returning">Returning to work</option>
+        </select>
+        <p class="field-hint" data-i18n="expHint">Used for your recommendations and weekly plan focus.</p>
       </div>
     </div>
 
-    <p class="chips-label" id="chipsLabel">Quick picks — tap one:</p>
+    <div class="field">
+      <label for="keywordInput" data-i18n="jobLooking">Job I’m looking for</label>
+      <input type="text" id="keywordInput" placeholder="e.g. warehouse associate" value="entry level" autocomplete="off">
+      <p class="field-hint" data-i18n="keywordHint">Typing updates every search button instantly.</p>
+    </div>
+
+    <p class="chips-label" id="chipsLabel" data-i18n="quickPicks">Quick picks — tap one:</p>
     <div class="chips" id="chips" role="group" aria-labelledby="chipsLabel">
       <button type="button" class="chip is-active" data-keyword="entry level">Any entry-level</button>
       <button type="button" class="chip" data-keyword="remote customer service">🏠 Remote Customer Service</button>
@@ -106,34 +155,54 @@
       <button type="button" class="chip" data-keyword="call center customer service">Call Center</button>
       <button type="button" class="chip" data-keyword="security guard">Security Guard</button>
       <button type="button" class="chip" data-keyword="general labor">General Labor</button>
-      <button type="button" class="chip chip-warn" data-keyword="delivery driver" data-warn="true">Delivery Driver <span aria-hidden="true">🚗</span></button>
+      <button type="button" class="chip" data-keyword="delivery driver" data-warn="true">Delivery Driver 🚗</button>
     </div>
-    <p class="warning-box" id="chipWarning" hidden>🚗 <strong>Heads up:</strong> Delivery Driver jobs almost always require your own car, a valid driver’s license, and insurance. Without a car, double-check the listing says “no car needed” (e.g. bike delivery) before spending time on it.</p>
+    <p class="warning-box" id="chipWarning" hidden>🚗 <strong data-i18n="deliveryWarnT">Heads up:</strong> <span data-i18n="deliveryWarn">Delivery Driver jobs almost always require your own car, a valid license, and insurance. Double-check the listing says “no car needed” before spending time on it.</span></p>
 
+    <div class="toolbar">
+      <button type="button" class="btn btn-secondary btn-sm" id="saveSearchBtn">⭐ <span data-i18n="saveSearch">Save this search</span></button>
+    </div>
+    <div class="saved-searches" id="savedSearches" aria-label="Saved searches"></div>
+
+    <h3 class="subhead">✅ <span data-i18n="readyTitle">Job-ready checklist</span></h3>
+    <p class="muted small" data-i18n="readyIntro">Check these off once — progress saves per profile and makes applying much faster.</p>
+    <div class="readiness-bar"><div id="readinessFill"></div></div>
+    <p class="field-hint" id="readinessText" aria-live="polite"></p>
+    <div class="readiness-list" id="readinessList"></div>
+  </section>
+
+  <!-- ======================= FIND JOBS ======================= -->
+  <section class="card" id="find" aria-labelledby="findTitle">
+    <h2 id="findTitle">🔎 <span data-i18n="findTitle">Find Jobs</span></h2>
+    <p class="muted" data-i18n="findIntro">Nothing here is a copied list and nothing is scraped — every button builds a live search for your job + your city/ZIP on that site’s real results.</p>
     <div class="search-summary" id="searchSummary" aria-live="polite"></div>
 
-    <div class="field">
-      <label for="siteFilter">Filter the job sites</label>
-      <input type="text" id="siteFilter" placeholder="Filter sites… try “remote”, “county”, “walmart”, “veterans”" autocomplete="off">
-      <p class="field-hint" id="siteCount" aria-live="polite"></p>
+    <div class="controls-grid tracker-filters">
+      <div class="field"><label for="siteFilter" data-i18n="filterSites">Filter the job sites</label><input type="text" id="siteFilter" placeholder="Try “remote”, “county”, “walmart”, “veterans”" autocomplete="off"><p class="field-hint" id="siteCount" aria-live="polite"></p></div>
+      <div class="field"><label for="favOnly">★ <span data-i18n="favOnly">Favorite sites only</span></label><span class="check-line"><input type="checkbox" id="favOnly"> <span data-i18n="favOnlyHint">Show only sites you starred</span></span><p class="field-hint" data-i18n="favHint">Tap ☆ on any site card to favorite it.</p></div>
     </div>
 
-    <h3 class="subhead">⭐ Start here — best first searches for you</h3>
-    <p class="muted small">These six give you the most live entry-level results near 95355 (plus remote). The <a href="#directory">full directory below</a> has every site from the Stanislaus County Workforce guide.</p>
+    <h3 class="subhead">⭐ <span data-i18n="startHere">Start here — best first searches for you</span></h3>
     <div class="site-grid" id="featuredGrid"></div>
   </section>
 
   <!-- ======================= TRACKER ======================= -->
   <section class="card" id="tracker" aria-labelledby="trackerTitle">
-    <h2 id="trackerTitle">🗂️ My Tracker</h2>
-    <p class="muted">Every job you save lives here. Move each one along: <strong>Saved → Applied → Interview → Offer</strong> (plus Rejected and Archived). Status can be changed right on each card. Saved only in this browser.</p>
+    <h2 id="trackerTitle">🗂️ <span data-i18n="trackerTitle">My Tracker</span></h2>
+    <p class="muted" data-i18n="trackerIntro">Move each job along: Saved → Applied → Interview → Offer (plus Rejected and Archived). Change status right on each card. Saved only in this browser, per profile.</p>
+
+    <div class="tracker-tools">
+      <div class="field goal-field"><label for="goalInput" data-i18n="goal">Weekly application goal</label><input type="number" id="goalInput" min="1" max="50" value="5"></div>
+      <div class="goal-progress"><div class="readiness-bar"><div id="goalFill"></div></div><p class="field-hint" id="goalText" aria-live="polite"></p></div>
+      <div class="field"><label for="trackerView" data-i18n="view">View</label><select id="trackerView"><option value="list">☰ List</option><option value="board">▦ Board (by status)</option></select></div>
+      <div class="field"><label for="sortSelect" data-i18n="sort">Sort</label><select id="sortSelect"><option value="newest">Newest first</option><option value="followup">Follow-up soonest</option><option value="priority">Priority (High first)</option><option value="distance">Distance (nearest)</option></select></div>
+    </div>
+    <p class="insights" id="trackerInsights" aria-live="polite"></p>
 
     <div class="toolbar">
       <button type="button" class="btn btn-secondary" id="exportCsvBtn">⬇ Export CSV</button>
-      <button type="button" class="btn btn-secondary" id="backupBtn">💾 Backup (JSON)</button>
-      <label class="btn btn-secondary file-btn">♻ Restore backup
-        <input type="file" id="restoreInput" accept=".json,application/json" hidden>
-      </label>
+      <button type="button" class="btn btn-secondary" id="backupBtn">💾 <span data-i18n="backupAll">Backup all (JSON)</span></button>
+      <label class="btn btn-secondary file-btn">♻ <span data-i18n="restore">Restore backup</span><input type="file" id="restoreInput" accept=".json,application/json" hidden></label>
     </div>
 
     <form id="jobForm" class="job-form" novalidate>
@@ -146,28 +215,17 @@
         <div class="field"><label for="fDistance">Distance (miles)</label><input id="fDistance" type="number" min="0" step="0.1" placeholder="e.g. 2.5"></div>
         <div class="field"><label for="fPay">Pay</label><input id="fPay" type="text" placeholder="e.g. $17/hr"></div>
         <div class="field"><label for="fTransport">How I’d get there</label>
-          <select id="fTransport">
-            <option value="remote">🏠 Remote</option>
-            <option value="walk">🚶 Walk / bike</option>
-            <option value="bus" selected>🚌 Bus-friendly</option>
-            <option value="car">🚗 Needs a car</option>
-          </select>
+          <select id="fTransport"><option value="remote">🏠 Remote</option><option value="walk">🚶 Walk / bike</option><option value="bus" selected>🚌 Bus-friendly</option><option value="car">🚗 Needs a car</option></select>
         </div>
         <div class="field field-wide"><label for="fUrl">Job posting URL</label><input id="fUrl" type="url" placeholder="https://… paste the posting link"></div>
-        <div class="field"><label for="fStatus">Status</label>
-          <select id="fStatus">
-            <option>Saved</option><option>Applied</option><option>Interview</option><option>Offer</option><option>Rejected</option><option>Archived</option>
-          </select>
-        </div>
-        <div class="field"><label for="fPriority">Priority</label>
-          <select id="fPriority"><option>Low</option><option selected>Normal</option><option>High</option></select>
-        </div>
+        <div class="field"><label for="fStatus">Status</label><select id="fStatus"><option>Saved</option><option>Applied</option><option>Interview</option><option>Offer</option><option>Rejected</option><option>Archived</option></select></div>
+        <div class="field"><label for="fPriority">Priority</label><select id="fPriority"><option>Low</option><option selected>Normal</option><option>High</option></select></div>
         <div class="field"><label for="fApplied">Date applied</label><input id="fApplied" type="date"></div>
         <div class="field"><label for="fFollow">Follow-up date</label><input id="fFollow" type="date"></div>
         <div class="field"><label for="fContact">Contact (name / phone / email)</label><input id="fContact" type="text" placeholder="e.g. Sam — 209-555-0100"></div>
         <div class="field field-wide"><label for="fNotes">Notes</label><textarea id="fNotes" rows="3" placeholder="Shift times, bus route, who you spoke to, next step…"></textarea></div>
       </div>
-      <p class="warning-box" id="formCarWarning" hidden>🚗 <strong>Usually needs a car:</strong> this location (Turlock / Riverbank / Oakdale / Salida / Stockton or far from 95355) is hard to reach without a car. Make sure you have a ride before applying.</p>
+      <p class="warning-box" id="formCarWarning" hidden>🚗 <strong>Usually needs a car:</strong> this looks far from home (or in a hard-to-reach city). Make sure you have a ride or a confirmed transit trip before applying.</p>
       <div class="form-actions">
         <button type="submit" class="btn btn-primary" id="submitBtn">＋ Add job</button>
         <button type="button" class="btn btn-ghost" id="cancelEditBtn" hidden>Cancel editing</button>
@@ -176,26 +234,33 @@
 
     <div class="controls-grid tracker-filters">
       <div class="field"><label for="trackSearch">Search tracked jobs</label><input id="trackSearch" type="text" placeholder="Search title, company, location, notes…" autocomplete="off"></div>
-      <div class="field"><label for="statusFilter">Filter by status</label>
-        <select id="statusFilter"><option value="">All statuses</option><option>Saved</option><option>Applied</option><option>Interview</option><option>Offer</option><option>Rejected</option><option>Archived</option></select>
-      </div>
-      <div class="field"><label for="transportFilter">Filter by transport</label>
-        <select id="transportFilter"><option value="">All transport</option><option value="remote">🏠 Remote</option><option value="walk">🚶 Walk / bike</option><option value="bus">🚌 Bus-friendly</option><option value="car">🚗 Needs a car</option></select>
-      </div>
+      <div class="field"><label for="statusFilter">Filter by status</label><select id="statusFilter"><option value="">All statuses</option><option>Saved</option><option>Applied</option><option>Interview</option><option>Offer</option><option>Rejected</option><option>Archived</option></select></div>
+      <div class="field"><label for="transportFilter">Filter by transport</label><select id="transportFilter"><option value="">All transport</option><option value="remote">🏠 Remote</option><option value="walk">🚶 Walk / bike</option><option value="bus">🚌 Bus-friendly</option><option value="car">🚗 Needs a car</option></select></div>
     </div>
     <p class="field-hint" id="trackerCount" aria-live="polite"></p>
-    <div id="appsList" class="apps-list"></div>
+    <div id="trackerResults">
+      <div id="appsList" class="apps-list"></div>
+      <div id="boardView" class="board-view" hidden></div>
+    </div>
     <div id="emptyState" class="empty-state">
       <p><strong>No jobs tracked yet.</strong></p>
-      <p>Use a <strong>＋ Track</strong> button on any site card above (it fills in the form for you), or add a job manually with the form. Your first good move: search <strong>Remote Customer Service</strong> and <strong>95355 entry-level</strong>, save 5 jobs, then apply.</p>
+      <p>Use a <strong>＋ Track</strong> button on any site card (it fills in the form for you), or add a job manually. Good first move: save 5 jobs, then apply to 3.</p>
     </div>
+  </section>
+
+  <!-- ======================= COUNTY RESOURCES ======================= -->
+  <section class="card" id="county" aria-labelledby="countyTitle">
+    <h2 id="countyTitle">🏛️ My County Resources</h2>
+    <p class="muted" id="countyIntro">Official county jobs, workforce help, schools and transit for your county — rebuilt whenever you change county/city/ZIP above.</p>
+    <p class="tip-box" id="adminCountyNoteBox" hidden>📌 <strong>Local note:</strong> <span id="adminCountyNoteText"></span></p>
+    <div class="site-grid" id="countyResources"></div>
   </section>
 
   <!-- ======================= DIRECTORY ======================= -->
   <section class="card" id="directory" aria-labelledby="dirTitle">
-    <h2 id="dirTitle">🌐 Job Sites Directory</h2>
-    <p class="muted">Every site below comes from the Stanislaus County Workforce Development guide, <a href="https://stanworkforce.com/media/zonmxzhn/job-search-website-resources.pdf" target="_blank" rel="noopener">“Job Search Website Resources” (PDF)</a>, organized by type. Each <strong>Search</strong> button is a live search for your current job + Modesto, CA 95355 — change the job or transport above and all of these update. Use the filter box in Find Jobs to narrow this list.</p>
-    <p class="tip-box">💡 <strong>Go direct when you can:</strong> as the Workforce guide says, employers post on their <em>own</em> websites first because it’s free for them — so the Direct Employers section can show openings before the big boards do.</p>
+    <h2 id="dirTitle">🌐 <span data-i18n="dirTitle">Job Sites Directory</span></h2>
+    <p class="muted">Built from the Stanislaus County Workforce Development guide, <a href="https://stanworkforce.com/media/zonmxzhn/job-search-website-resources.pdf" target="_blank" rel="noopener">“Job Search Website Resources” (PDF)</a>, and expanded for all of California. Every <strong>Search</strong> button is a live search for your current job + your city/ZIP. ☆ favorites and admin-added sites are marked.</p>
+    <p class="tip-box">💡 <strong>Go direct when you can:</strong> employers post on their <em>own</em> websites first because it’s free for them — check Direct Employers before the big boards.</p>
     <div id="directoryGroups"></div>
     <p class="small muted" id="directoryEmpty" hidden>No sites match that filter. Try a shorter word — e.g. “indeed”, “remote”, “county”, “health”.</p>
   </section>
@@ -204,57 +269,141 @@
   <section class="card weekly" id="weekly" aria-labelledby="weeklyTitle">
     <div class="weekly-head">
       <div>
-        <h2 id="weeklyTitle">🗓️ Weekly Plan</h2>
-        <p class="muted">A simple Mon–Sun routine for a no-car job search. Checkboxes save automatically in this browser. Print it and stick it on the fridge.</p>
+        <h2 id="weeklyTitle">🗓️ <span data-i18n="weeklyTitle">Weekly Plan</span></h2>
+        <p class="muted" data-i18n="weeklyIntro">A simple Mon–Sun routine. Checkboxes save automatically per profile. Print it and stick it on the fridge.</p>
       </div>
       <div class="toolbar">
-        <button type="button" class="btn btn-primary" id="printBtn">🖨 Print weekly plan</button>
-        <button type="button" class="btn btn-ghost" id="resetWeekBtn">↺ Reset week</button>
+        <button type="button" class="btn btn-primary" id="printBtn">🖨 <span data-i18n="print">Print weekly plan</span></button>
+        <button type="button" class="btn btn-ghost" id="resetWeekBtn">↺ <span data-i18n="resetWeek">Reset week</span></button>
       </div>
     </div>
     <div class="week-grid" id="weekGrid"></div>
-    <p class="small muted print-only-note">Stanislaus Job Finder — weekly plan • Modesto, CA 95355 • stanworkforce.com for free local help</p>
+    <p class="small muted print-only-note">California Job Finder (Stanislaus Job Finder) — weekly plan • Free local help: CalJOBS caljobs.ca.gov • EDD edd.ca.gov</p>
   </section>
 
   <!-- ======================= HELP ======================= -->
   <section class="card" id="help" aria-labelledby="helpTitle">
-    <h2 id="helpTitle">🆘 Free Local Help</h2>
+    <h2 id="helpTitle">🆘 <span data-i18n="helpTitle">Free Help Anywhere in California</span></h2>
     <div class="help-grid">
       <article class="help-card">
-        <h3>🏢 Stanislaus Workforce Development</h3>
-        <p>Free job-search help, workshops, resume help, and the America’s Job Center of California in Modesto. This site’s directory comes from their “Job Search Website Resources” guide.</p>
-        <p><a class="btn btn-secondary" href="https://www.stanworkforce.com/" target="_blank" rel="noopener">stanworkforce.com ↗</a>
-        <a class="btn btn-ghost" href="https://stanworkforce.com/media/zonmxzhn/job-search-website-resources.pdf" target="_blank" rel="noopener">Job Search Resources (PDF) ↗</a></p>
-      </article>
-      <article class="help-card">
-        <h3>🟦 CalJOBS</h3>
-        <p>California’s free state job board from the Employment Development Department (EDD). Search and apply to jobs across the state, including Stanislaus County.</p>
+        <h3>🟦 CalJOBS (free, statewide)</h3>
+        <p>California’s free state job board from the EDD. Search and apply across the state, and get help at your local America’s Job Center.</p>
         <p><a class="btn btn-secondary" href="https://www.caljobs.ca.gov/" target="_blank" rel="noopener">caljobs.ca.gov ↗</a></p>
       </article>
       <article class="help-card">
-        <h3>🚌 StanRTA — bus trip planning</h3>
-        <p>Stanislaus Regional Transit Authority runs Modesto city buses and county routes (including Modesto ⇄ Ceres). Check routes, schedules, and fares before you apply.</p>
-        <p><a class="btn btn-secondary" href="https://www.stanrta.org/" target="_blank" rel="noopener">stanrta.org ↗</a>
-        <a class="btn btn-ghost" href="https://www.google.com/maps/dir/?api=1&amp;origin=Modesto%2C+CA+95355&amp;destination=Modesto%2C+CA&amp;travelmode=transit" target="_blank" rel="noopener">Check bus route ↗</a></p>
+        <h3>🏢 Your County Workforce / AJCC</h3>
+        <p id="helpWorkforceText">Free job-search help, workshops, resume help and computer access. Stanislaus: Stanislaus Workforce Development.</p>
+        <p><a class="btn btn-secondary" id="helpWorkforceBtn" href="https://www.stanworkforce.com/" target="_blank" rel="noopener">Find workforce help ↗</a>
+        <a class="btn btn-ghost" href="https://www.careeronestop.org/LocalHelp/AmericanJobCenters/american-job-centers.aspx" target="_blank" rel="noopener">Find an AJCC near you ↗</a></p>
+      </article>
+      <article class="help-card">
+        <h3>🚌 Plan Your Trip</h3>
+        <p id="helpTransitText">Check transit before you apply — route, fare, and the trip home at your shift time.</p>
+        <p><a class="btn btn-secondary" id="helpTransitBtn" href="https://www.google.com/maps/dir/?api=1&amp;origin=Modesto%2C+CA+95355&amp;destination=Modesto%2C+CA&amp;travelmode=transit" target="_blank" rel="noopener">Check transit route ↗</a></p>
+      </article>
+      <article class="help-card">
+        <h3>📄 Stanislaus Guide (source of this directory)</h3>
+        <p>The “Job Search Website Resources” PDF from Stanislaus County Workforce Development that this directory is built from.</p>
+        <p><a class="btn btn-secondary" href="https://stanworkforce.com/media/zonmxzhn/job-search-website-resources.pdf" target="_blank" rel="noopener">Open the PDF ↗</a> <a class="btn btn-ghost" href="https://www.stanworkforce.com/" target="_blank" rel="noopener">stanworkforce.com ↗</a></p>
       </article>
     </div>
 
     <div class="safety-box" role="note">
-      <h3>⚠ Stay safe: spot a scam</h3>
-      <p><strong>Real employers NEVER ask you to pay to get hired, buy gift cards, or cash a check and send money back.</strong> If a “job” asks for any of that — or wants your bank login, full SSN by text/email before an interview, or payment for “equipment” up front — it is a scam. Stop, don’t send money or personal info, and report it. When in doubt, ask Stanislaus Workforce Development (above) to look at the posting with you — that help is free.</p>
-      <ul>
-        <li>Apply through the employer’s real website or a site in the directory above.</li>
-        <li>Be careful with jobs that only contact you by text/Telegram/WhatsApp and offer high pay for very easy work.</li>
-        <li>Never deposit a check from a “new employer” and forward part of it — the check will bounce and you’ll owe the bank.</li>
-      </ul>
+      <h3>⚠ <span data-i18n="safetyTitle">Stay safe: spot a scam</span></h3>
+      <p><strong data-i18n="safetyStrong">Real employers NEVER ask you to pay to get hired, buy gift cards, or cash a check and send money back.</strong> <span data-i18n="safetyBody">If a “job” asks for that — or your bank login, or payment for “equipment” up front — it is a scam. Stop and ask your local workforce center to look at the posting with you. That help is free.</span></p>
+    </div>
+  </section>
+
+  <!-- ======================= ADMIN (ENCRYPTED) ======================= -->
+  <section class="card admin-card" id="admin" aria-labelledby="adminTitle">
+    <h2 id="adminTitle">🔐 <span data-i18n="adminTitle">Admin (Encrypted)</span></h2>
+    <p class="muted" data-i18n="adminIntro">For whoever runs this tool (workforce center, library, nonprofit, family). The admin vault is encrypted in this browser with AES-256 — your password is never stored. Unlocking lets you edit the announcement, job sites, county notes, private admin notes, and data tools.</p>
+    <p class="warning-box">🔒 <strong>Honest security note:</strong> encryption protects the admin vault &amp; private notes <em>at rest on this device</em> and stops casual snooping. Because there is no server, it cannot stop someone with full browser/developer access from changing the public page on this device. For a multi-location public deployment, put this behind your organization’s real login.</p>
+    <p class="admin-status" id="adminLockState" aria-live="polite">🔒 Admin is locked.</p>
+
+    <div id="adminSetup" hidden>
+      <h3>Create the admin vault</h3>
+      <p class="muted small">First time only. Choose a strong password (8+ characters). <strong>There is no reset</strong> — if you forget it, you can only delete the vault and start over.</p>
+      <div class="form-grid">
+        <div class="field"><label for="adminNewPassword">Admin password</label><input type="password" id="adminNewPassword" autocomplete="new-password"></div>
+        <div class="field"><label for="adminNewPassword2">Repeat password</label><input type="password" id="adminNewPassword2" autocomplete="new-password"></div>
+      </div>
+      <p><button type="button" class="btn btn-primary" id="createVaultBtn">🔐 Create encrypted vault</button></p>
+    </div>
+
+    <div id="adminUnlock" hidden>
+      <h3>Unlock admin</h3>
+      <div class="form-grid">
+        <div class="field"><label for="adminPassword">Admin password</label><input type="password" id="adminPassword" autocomplete="current-password"></div>
+      </div>
+      <p><button type="button" class="btn btn-primary" id="unlockVaultBtn">🔓 Unlock</button></p>
+    </div>
+
+    <div id="adminPanel" hidden>
+      <div class="toolbar">
+        <button type="button" class="btn btn-secondary" id="lockVaultBtn">🔒 Lock admin now</button>
+        <span class="muted small">Auto-locks after 10 minutes. The encryption key lives only in memory — never in storage.</span>
+      </div>
+
+      <h3 class="subhead">📢 Announcement banner</h3>
+      <label class="check-line"><input type="checkbox" id="bannerEnabled"> Show this banner at the top of the page for everyone</label>
+      <div class="field"><label for="bannerText">Banner text</label><input type="text" id="bannerText" placeholder="e.g. Job fair Thursday 10am at the AJCC — bring your resume!"></div>
+      <p><button type="button" class="btn btn-secondary btn-sm" id="saveBannerBtn">Save banner</button></p>
+
+      <h3 class="subhead">📝 Private admin notes (encrypted)</h3>
+      <div class="field"><label for="adminNotes">Only visible while unlocked. Saved encrypted — never in plain text.</label><textarea id="adminNotes" rows="4" placeholder="Private notes: contacts, wi-fi for the job lab, supply needs…"></textarea></div>
+      <p><button type="button" class="btn btn-secondary btn-sm" id="saveVaultBtn">💾 Save encrypted notes</button></p>
+
+      <h3 class="subhead">➕ Add a custom job site</h3>
+      <p class="muted small">Use placeholders in the URL: <code>{keyword}</code> <code>{city}</code> <code>{zip}</code> <code>{county}</code> <code>{radius}</code> — e.g. <code>https://example.com/jobs?q={keyword}&amp;l={zip}</code></p>
+      <div class="form-grid">
+        <div class="field"><label for="csName">Site name</label><input type="text" id="csName" placeholder="e.g. Valley Medical Jobs"></div>
+        <div class="field field-wide"><label for="csUrl">Search URL template</label><input type="url" id="csUrl" placeholder="https://…{keyword}…{zip}…"></div>
+        <div class="field field-wide"><label for="csDesc">Short description</label><input type="text" id="csDesc" placeholder="What is this site good for?"></div>
+      </div>
+      <p><button type="button" class="btn btn-secondary btn-sm" id="addCustomSiteBtn">＋ Add custom site</button></p>
+      <div id="customSitesList"></div>
+
+      <h3 class="subhead">👁 Built-in sites: show / hide</h3>
+      <p class="muted small">Uncheck a site to hide it from the directory for everyone on this device. Changes save instantly.</p>
+      <div class="visibility-list" id="siteVisibilityList"></div>
+
+      <h3 class="subhead">📌 County note</h3>
+      <div class="form-grid">
+        <div class="field"><label for="adminCountySelect">County</label><select id="adminCountySelect"></select></div>
+        <div class="field field-wide"><label for="adminCountyNote">Note shown in “My County Resources”</label><input type="text" id="adminCountyNote" placeholder="e.g. Free resume printing at the county library main branch"></div>
+      </div>
+      <p><button type="button" class="btn btn-secondary btn-sm" id="saveCountyNoteBtn">Save county note</button></p>
+
+      <h3 class="subhead">🔑 Change admin password</h3>
+      <div class="form-grid">
+        <div class="field"><label for="adminChangeNew">New password</label><input type="password" id="adminChangeNew" autocomplete="new-password"></div>
+        <div class="field"><label for="adminChangeNew2">Repeat new password</label><input type="password" id="adminChangeNew2" autocomplete="new-password"></div>
+      </div>
+      <p><button type="button" class="btn btn-secondary btn-sm" id="changePasswordBtn">Change password (re-encrypts vault)</button></p>
+
+      <h3 class="subhead">📊 Diagnostics</h3>
+      <div class="app-notes" id="adminDiag">—</div>
+
+      <h3 class="subhead">🧰 Data tools</h3>
+      <div class="toolbar">
+        <button type="button" class="btn btn-secondary" id="encBackupBtn">🔐 Encrypted backup (all data)</button>
+        <label class="btn btn-secondary file-btn">🔓 Restore encrypted backup<input type="file" id="encRestoreInput" accept=".json,application/json" hidden></label>
+      </div>
+      <h3 class="subhead danger-head">⚠ Danger zone</h3>
+      <div class="toolbar">
+        <button type="button" class="btn btn-danger" id="wipeProfileBtn">Erase current profile</button>
+        <button type="button" class="btn btn-danger" id="wipeAllBtn">Erase ALL data on this device</button>
+        <button type="button" class="btn btn-danger" id="deleteVaultBtn">Delete admin vault</button>
+      </div>
     </div>
   </section>
 
 </main>
 
 <footer class="footer wrap">
-  <p><strong>Stanislaus Job Finder</strong> — made for Modesto, CA 95355. No account, no tracking server: your applications live only in this browser’s localStorage.</p>
-  <p class="small">Tip: bookmark this page, back up your tracker (JSON) regularly, and bring your printed Weekly Plan + a list of applications to Stanislaus Workforce Development for free one-on-one help.</p>
+  <p><strong>California Job Finder</strong> — <span data-i18n="footerLine">born as Stanislaus Job Finder in Modesto, CA. No account, no tracking server: your data lives only in this browser.</span></p>
+  <p class="small">58-county edition • Print your Weekly Plan and bring it to your local America’s Job Center for free one-on-one help.</p>
 </footer>
 
 <script src="app.js"></script>
