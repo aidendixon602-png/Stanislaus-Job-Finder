@@ -72,7 +72,14 @@ Directory built from the Stanislaus County Workforce Development guide, [“Job 
 | `app.js` | Vanilla JS — 58-county engine, profiles, live URL builders, tracker, i18n, Web Crypto admin vault |
 | `serve.mjs` | Optional zero-dependency Node server, port **4173**, `0.0.0.0` |
 | `package.json` | `"start": "node serve.mjs"` |
+| `_headers` | Security response headers served by Cloudflare on every request (CSP, anti-clickjacking, HSTS…) |
+| `.assetsignore` | Keeps Cloudflare deploys tiny & safe — only the 3 web files upload, never repo internals |
+| `SECURITY.md` | Cloudflare DDoS checklist + what's hardened in code (read this before going public) |
 | `Stanislaus-Job-Finder.zip` | Downloadable copy of these root files |
+
+## Security & DDoS (Cloudflare)
+
+Deployed on Cloudflare Workers, the site sits behind Cloudflare's unmetered edge DDoS mitigation with **no origin server to attack**. The repo ships strict security headers (`_headers`), a hardened local server, `.assetsignore`-trimmed deploys, upload sanitization, and a stronger admin vault (PBKDF2 **600k** iterations, failed-unlock throttling, 10-char minimum). **Full checklist + honest limits: [SECURITY.md](SECURITY.md)** — including the 5-minute dashboard steps (custom domain, disable `workers.dev`, Bot Fight Mode, Under Attack mode, account 2FA/passkey, build-token hygiene).
 
 ## Privacy & data keys
 

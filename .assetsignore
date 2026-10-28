@@ -1,0 +1,11 @@
+node_modules/
+.git/
+.wrangler/
+serve.mjs
+package.json
+package-lock.json
+wrangler.jsonc
+Stanislaus-Job-Finder.zip
+README.md
+SECURITY.md
+.gitignore

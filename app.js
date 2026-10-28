@@ -155,6 +155,7 @@ function loadProfileData(id) {
   settings = Object.assign({}, DEFAULT_SETTINGS, store(pkey(id, 'settings'), {}));
   if (!TRANSPORTS[settings.transport]) settings.transport = 'nocar';
   apps = store(pkey(id, 'apps'), []); if (!Array.isArray(apps)) apps = [];
+  apps = apps.filter((a) => a && typeof a === 'object').map(sanitizeApp);
   weekState = store(pkey(id, 'week'), {}); if (!weekState || typeof weekState !== 'object') weekState = {};
 }
 function initProfiles() {
@@ -173,6 +174,22 @@ function initProfiles() {
   loadProfileData(meta.activeId);
 }
 function activeProfile() { return meta.profiles.find((p) => p.id === meta.activeId); }
+function sanitizeApp(a) {
+  const clean = (v, max) => String(v == null ? '' : v).slice(0, max || 300);
+  const dateOk = (v) => /^\d{4}-\d{2}-\d{2}$/.test(String(v || '')) ? String(v) : '';
+  const dist = parseFloat(a.distance);
+  return {
+    id: clean(a.id, 80) || (String(Date.now()) + '-' + Math.random().toString(36).slice(2, 7)),
+    title: clean(a.title, 200), company: clean(a.company, 200), location: clean(a.location, 200),
+    distance: isNaN(dist) || dist < 0 ? '' : Math.min(dist, 100000),
+    pay: clean(a.pay, 120), transport: TRANSPORT_TAGS[a.transport] ? a.transport : 'bus',
+    url: safeUrl(a.url), status: STATUSES.includes(a.status) ? a.status : 'Saved',
+    priority: ['Low', 'Normal', 'High'].includes(a.priority) ? a.priority : 'Normal',
+    dateApplied: dateOk(a.dateApplied), followUp: dateOk(a.followUp),
+    contact: clean(a.contact, 200), notes: clean(a.notes, 5000),
+    createdAt: Number.isFinite(Number(a.createdAt)) ? Number(a.createdAt) : Date.now()
+  };
+}
 function savePublic() { save(LS_PUBLIC, publicConfig); }
 function savePrefs() { save(LS_PREFS, prefs); }
 
@@ -211,7 +228,7 @@ function renderLocation() {
   $('#recTransitText').textContent = agency ? ('Local transit: ' + agency + '. Plan the trip before you apply — and again before any interview.') : 'Plan the transit trip before you apply — and again before any interview. Use the route checker on the right.';
   $('#transitBoxTitle').textContent = agency ? ('🚌 ' + agency + (settings.county === 'Stanislaus' ? ' (Stanislaus Regional Transit)' : '')) : ('🚌 Public transit near ' + c.city);
   $('#transitBoxText').innerHTML = settings.county === 'Stanislaus'
-    ? 'Modesto city buses + county routes (Modesto ⇄ Ceres and more). Check schedules and fares at <a href="https://www.stanrta.org/" target="_blank" rel="noopener">stanrta.org</a>.'
+    ? 'Modesto city buses + county routes (Modesto ⇄ Ceres and more). Check schedules and fares at <a href="https://www.stanrta.org/" target="_blank" rel="noopener noreferrer">stanrta.org</a>.'
     : 'Check routes, schedules and fares for ' + esc(c.city) + (agency ? ' with <strong>' + esc(agency) + '</strong>' : '') + ' before you apply. Always check the trip home at your shift time too.';
   $('#busRouteBtn').href = busRouteUrl(c.loc, c.city + ', CA');
   $('#countyHint').textContent = 'County seat: ' + co.seat + (agency ? ' • Transit: ' + agency : ' • Transit: search “' + co.seat + ' CA public transit”');
@@ -227,7 +244,7 @@ function siteCard(site, c) {
   return '<article class="site-card"><div class="site-head"><span class="site-cat">' + esc(CAT_LABEL[site.cat] || site.cat) + (site.cat === 'custom' ? ' • Admin' : '') + '</span>' +
     '<button type="button" class="fav-btn' + (fav ? ' is-fav' : '') + '" data-fav="' + esc(site.id) + '" aria-label="Favorite ' + esc(site.name) + '" title="Favorite">' + (fav ? '★' : '☆') + '</button></div>' +
     '<h4>' + esc(site.name) + '</h4><p>' + esc(site.desc) + '</p><div class="site-actions">' +
-    '<a class="btn btn-primary btn-sm" href="' + esc(href) + '" target="_blank" rel="noopener">🔎 ' + searchLabel + ' “' + esc(c.kw) + '” ↗</a>' +
+    '<a class="btn btn-primary btn-sm" href="' + esc(href) + '" target="_blank" rel="noopener noreferrer">🔎 ' + searchLabel + ' “' + esc(c.kw) + '” ↗</a>' +
     '<button type="button" class="btn btn-track btn-sm" data-track="' + esc(site.id) + '">＋ Track</button></div></article>';
 }
 let countyTrackSites = [];
@@ -259,7 +276,7 @@ function renderCounty() {
     { name: co.transit ? co.transit + ' — transit trip check' : 'Transit near ' + c.city, desc: 'Google Maps transit directions from home (' + c.loc + ') — check both directions at shift times.', url: busRouteUrl(c.loc, c.city + ', CA') },
     { name: 'EdJoin — School Jobs', desc: 'School district jobs in ' + settings.county + ' County: aides, custodial, food service, office.', url: 'https://www.edjoin.org/Home/SearchKeywords?searchKeyword=' + E(c.kw) }
   ];
-  $('#countyResources').innerHTML = countyTrackSites.map((s, i) => '<article class="site-card"><span class="site-cat">' + esc(settings.county) + ' County</span><h4>' + esc(s.name) + '</h4><p>' + esc(s.desc) + '</p><div class="site-actions"><a class="btn btn-primary btn-sm" href="' + esc(safeUrl(s.url) || '#') + '" target="_blank" rel="noopener">Open ↗</a></div></article>').join('');
+  $('#countyResources').innerHTML = countyTrackSites.map((s, i) => '<article class="site-card"><span class="site-cat">' + esc(settings.county) + ' County</span><h4>' + esc(s.name) + '</h4><p>' + esc(s.desc) + '</p><div class="site-actions"><a class="btn btn-primary btn-sm" href="' + esc(safeUrl(s.url) || '#') + '" target="_blank" rel="noopener noreferrer">Open ↗</a></div></article>').join('');
   $('#helpWorkforceText').textContent = isStan ? 'Free job-search help, workshops, resume help and computer access. Stanislaus: Stanislaus Workforce Development (stanworkforce.com).' : ('Free help in ' + settings.county + ' County: your local America’s Job Center (AJCC) — resume help, workshops, computers. Find yours by ZIP (' + (c.zip || c.city) + ').');
   $('#helpWorkforceBtn').href = isStan ? 'https://www.stanworkforce.com/' : 'https://www.careeronestop.org/LocalHelp/AmericanJobCenters/american-job-centers.aspx?location=' + E(c.zip || c.city + ', CA');
   $('#helpWorkforceBtn').textContent = isStan ? 'stanworkforce.com ↗' : 'Find your AJCC ↗';
@@ -306,8 +323,8 @@ function appCard(a, compact) {
     '<dl class="app-details">' + (a.dateApplied ? '<div><dt>Date applied</dt><dd>' + esc(a.dateApplied) + '</dd></div>' : '') + (a.followUp ? '<div><dt>Follow up by</dt><dd>' + esc(a.followUp) + '</dd></div>' : '') + (a.contact ? '<div><dt>Contact</dt><dd>' + esc(a.contact) + '</dd></div>' : '') + '</dl>' +
     (a.notes ? '<p class="app-notes">' + esc(a.notes) + '</p>' : '') +
     '<div class="app-actions"><label class="small" style="font-weight:700">Status: <select data-status="' + esc(a.id) + '">' + opts + '</select></label>' +
-    (url ? '<a class="btn btn-secondary btn-sm" href="' + esc(url) + '" target="_blank" rel="noopener">↗ View posting</a>' : '') +
-    ((a.transport === 'bus' || a.transport === 'walk') ? '<a class="btn btn-bus btn-sm" href="' + esc(busRouteUrl(ctx().loc, dest || ctx().city + ', CA')) + '" target="_blank" rel="noopener">🗺️ Check bus route</a>' : '') +
+    (url ? '<a class="btn btn-secondary btn-sm" href="' + esc(url) + '" target="_blank" rel="noopener noreferrer">↗ View posting</a>' : '') +
+    ((a.transport === 'bus' || a.transport === 'walk') ? '<a class="btn btn-bus btn-sm" href="' + esc(busRouteUrl(ctx().loc, dest || ctx().city + ', CA')) + '" target="_blank" rel="noopener noreferrer">🗺️ Check bus route</a>' : '') +
     '<button type="button" class="btn btn-ghost btn-sm" data-edit="' + esc(a.id) + '">✏ Edit</button><button type="button" class="btn btn-ghost btn-sm" data-dup="' + esc(a.id) + '">⧉ Copy</button><button type="button" class="btn btn-danger btn-sm" data-del="' + esc(a.id) + '">🗑 Delete</button></div></article>';
 }
 function renderApps() {
@@ -349,7 +366,7 @@ function renderFocus(doneCount, goalCount) {
   const backupDue = apps.length >= 3 && (!lastBackup || Date.now() - lastBackup > 14 * 864e5);
   const c = ctx(); const sites = allSites();
   const quick = ['indeed', 'google', 'ziprecruiter'].map((id) => sites.find((s) => s.id === id)).filter(Boolean)
-    .map((s) => '<a class="btn btn-secondary btn-sm" href="' + esc(safeUrl(s.url(c)) || '#') + '" target="_blank" rel="noopener">' + esc(s.name) + ': “' + esc(c.kw) + '” ↗</a>').join(' ');
+    .map((s) => '<a class="btn btn-secondary btn-sm" href="' + esc(safeUrl(s.url(c)) || '#') + '" target="_blank" rel="noopener noreferrer">' + esc(s.name) + ': “' + esc(c.kw) + '” ↗</a>').join(' ');
   const next = overdue.length
     ? { text: 'Follow up on <strong>' + esc(overdue[0].title || 'your overdue job') + '</strong>' + (overdue[0].company ? ' @ ' + esc(overdue[0].company) : '') + ' — it was due ' + esc(overdue[0].followUp) + '.', href: '#tracker', label: 'Go to tracker →' }
     : savedOnly.length
@@ -443,7 +460,7 @@ function restoreData(data) {
   }
   const incoming = Array.isArray(data) ? data : data && data.apps;
   if (Array.isArray(incoming)) {
-    apps = incoming.filter((a) => a && typeof a === 'object').map((a) => Object.assign({ id:String(a.id || Date.now() + Math.random()), title:'', company:'', location:'', distance:'', pay:'', transport:'bus', url:'', status:'Saved', priority:'Normal', dateApplied:'', followUp:'', contact:'', notes:'', createdAt:Date.now() }, a));
+    apps = incoming.filter((a) => a && typeof a === 'object').map((a) => sanitizeApp(a));
     if (!Array.isArray(data) && data.settings) settings = Object.assign({}, DEFAULT_SETTINGS, data.settings);
     if (!Array.isArray(data) && data.week) weekState = data.week;
     saveCurrent(); renderAll(); return true;
@@ -453,18 +470,20 @@ function restoreData(data) {
 function csvCell(v) { return '"' + String(v == null ? '' : v).replace(/"/g, '""') + '"'; }
 
 /* ---------------- Admin: AES-256-GCM vault (Web Crypto) ---------------- */
-const ADMIN_ITER = 310000;
+const ADMIN_ITER = 600000; const LEGACY_ITER = 310000;
 let adminSession = null, adminVaultData = null, adminLockTimer = null;
 const cryptoOK = !!(window.crypto && crypto.subtle && crypto.getRandomValues);
 const te = typeof TextEncoder !== 'undefined' ? new TextEncoder() : { encode: (s) => Uint8Array.from(unescape(encodeURIComponent(s)), (ch) => ch.charCodeAt(0)) };
 const td = typeof TextDecoder !== 'undefined' ? new TextDecoder() : { decode: (buf) => decodeURIComponent(escape(String.fromCharCode(...new Uint8Array(buf)))) };
 function b64(buf) { const bytes = new Uint8Array(buf); let s = ''; bytes.forEach((b) => { s += String.fromCharCode(b); }); return btoa(s); }
 function unb64(s) { const bin = atob(s); const bytes = new Uint8Array(bin.length); for (let i = 0; i < bin.length; i++) bytes[i] = bin.charCodeAt(i); return bytes; }
-async function deriveKey(password, saltBytes) { const base = await crypto.subtle.importKey('raw', te.encode(password), 'PBKDF2', false, ['deriveKey']); return crypto.subtle.deriveKey({ name:'PBKDF2', salt: saltBytes, iterations: ADMIN_ITER, hash:'SHA-256' }, base, { name:'AES-GCM', length:256 }, false, ['encrypt','decrypt']); }
+async function deriveKey(password, saltBytes, iterations) { const base = await crypto.subtle.importKey('raw', te.encode(password), 'PBKDF2', false, ['deriveKey']); return crypto.subtle.deriveKey({ name:'PBKDF2', salt: saltBytes, iterations: iterations || ADMIN_ITER, hash:'SHA-256' }, base, { name:'AES-GCM', length:256 }, false, ['encrypt','decrypt']); }
+function adminThrottleGet() { try { return JSON.parse(sessionStorage.getItem('sjf.v2.adminThrottle') || '{}'); } catch (e) { return {}; } }
+function adminThrottleSet(v) { try { if (v) sessionStorage.setItem('sjf.v2.adminThrottle', JSON.stringify(v)); else sessionStorage.removeItem('sjf.v2.adminThrottle'); } catch (e) {} }
 async function encryptJSON(key, obj) { const iv = crypto.getRandomValues(new Uint8Array(12)); const ct = await crypto.subtle.encrypt({ name:'AES-GCM', iv }, key, te.encode(JSON.stringify(obj))); return { iv: b64(iv), data: b64(ct) }; }
 async function decryptJSON(key, ivB64, dataB64) { const pt = await crypto.subtle.decrypt({ name:'AES-GCM', iv: unb64(ivB64) }, key, unb64(dataB64)); return JSON.parse(td.decode(pt)); }
 function getVault() { return store(LS_ADMIN, null); }
-async function writeVault() { const vault = getVault(); const enc = await encryptJSON(adminSession.key, adminVaultData); save(LS_ADMIN, { v:1, salt: adminSession.salt, iv: enc.iv, data: enc.data, iterations: ADMIN_ITER, updatedAt: new Date().toISOString() }); }
+async function writeVault() { const vault = getVault(); const enc = await encryptJSON(adminSession.key, adminVaultData); save(LS_ADMIN, { v:1, salt: adminSession.salt, iv: enc.iv, data: enc.data, iterations: adminSession.iterations || ADMIN_ITER, updatedAt: new Date().toISOString() }); }
 function lockAdmin(silent) { adminSession = null; adminVaultData = null; if (adminLockTimer) clearTimeout(adminLockTimer); const n = $('#adminNotes'); if (n) n.value = ''; const p = $('#adminPassword'); if (p) p.value = ''; renderAdmin(); if (!silent) { /* status rendered */ } }
 function armAutoLock() { if (adminLockTimer) clearTimeout(adminLockTimer); adminLockTimer = setTimeout(() => { lockAdmin(true); alert('Admin auto-locked after 10 minutes.'); }, 10 * 60 * 1000); }
 function renderAdmin() {
@@ -614,22 +633,24 @@ document.addEventListener('DOMContentLoaded', () => {
   $('#createVaultBtn').addEventListener('click', async () => {
     if (!cryptoOK) { alert('Web Crypto is not available in this browser/context.'); return; }
     const p1 = $('#adminNewPassword').value, p2 = $('#adminNewPassword2').value;
-    if (p1.length < 8) { alert('Use at least 8 characters.'); return; } if (p1 !== p2) { alert('Passwords do not match.'); return; }
+    if (p1.length < 10) { alert('Use at least 10 characters — longer is better.'); return; } if (p1 !== p2) { alert('Passwords do not match.'); return; }
     const salt = crypto.getRandomValues(new Uint8Array(16)); const key = await deriveKey(p1, salt);
-    adminSession = { key, salt: b64(salt) }; adminVaultData = { privateNotes:'', createdAt: new Date().toISOString(), updatedAt: new Date().toISOString() };
+    adminSession = { key, salt: b64(salt), iterations: ADMIN_ITER }; adminVaultData = { privateNotes:'', createdAt: new Date().toISOString(), updatedAt: new Date().toISOString() };
     await writeVault(); $('#adminNewPassword').value = ''; $('#adminNewPassword2').value = ''; armAutoLock(); renderAdmin(); alert('Encrypted admin vault created and unlocked.');
   });
   $('#unlockVaultBtn').addEventListener('click', async () => {
     const vault = getVault(); if (!vault) return;
-    try { const key = await deriveKey($('#adminPassword').value, unb64(vault.salt)); adminVaultData = await decryptJSON(key, vault.iv, vault.data); adminSession = { key, salt: vault.salt }; armAutoLock(); renderAdmin(); }
-    catch (e) { adminSession = null; adminVaultData = null; alert('Wrong password — vault stayed locked.'); renderAdmin(); }
+    const th = adminThrottleGet();
+    if (th.until && th.until > Date.now()) { alert('Too many wrong tries. Wait ' + Math.ceil((th.until - Date.now()) / 1000) + ' seconds and try again.'); return; }
+    try { const iter = Number(vault.iterations) || LEGACY_ITER; const key = await deriveKey($('#adminPassword').value, unb64(vault.salt), iter); adminVaultData = await decryptJSON(key, vault.iv, vault.data); adminSession = { key, salt: vault.salt, iterations: iter }; adminThrottleSet(null); armAutoLock(); renderAdmin(); }
+    catch (e) { adminSession = null; adminVaultData = null; const fails = (th.fails || 0) + 1; const waitMs = Math.min(30000, 1000 * Math.pow(2, fails)); adminThrottleSet({ fails, until: Date.now() + waitMs }); alert('Wrong password — vault stayed locked. Next try allowed in ' + Math.round(waitMs / 1000) + 's.'); renderAdmin(); }
   });
   $('#lockVaultBtn').addEventListener('click', () => lockAdmin(false));
   $('#saveVaultBtn').addEventListener('click', async () => { if (!adminSession) return; adminVaultData.privateNotes = $('#adminNotes').value; adminVaultData.updatedAt = new Date().toISOString(); await writeVault(); armAutoLock(); renderAdminLists(); alert('Private notes saved — encrypted.'); });
   $('#changePasswordBtn').addEventListener('click', async () => {
     if (!adminSession) return; const n1 = $('#adminChangeNew').value, n2 = $('#adminChangeNew2').value;
-    if (n1.length < 8) { alert('Use at least 8 characters.'); return; } if (n1 !== n2) { alert('New passwords do not match.'); return; }
-    const salt = crypto.getRandomValues(new Uint8Array(16)); adminSession = { key: await deriveKey(n1, salt), salt: b64(salt) }; adminVaultData.updatedAt = new Date().toISOString(); await writeVault(); $('#adminChangeNew').value = ''; $('#adminChangeNew2').value = ''; armAutoLock(); alert('Password changed — vault re-encrypted.');
+    if (n1.length < 10) { alert('Use at least 10 characters — longer is better.'); return; } if (n1 !== n2) { alert('New passwords do not match.'); return; }
+    const salt = crypto.getRandomValues(new Uint8Array(16)); adminSession = { key: await deriveKey(n1, salt, ADMIN_ITER), salt: b64(salt), iterations: ADMIN_ITER }; adminVaultData.updatedAt = new Date().toISOString(); await writeVault(); $('#adminChangeNew').value = ''; $('#adminChangeNew2').value = ''; armAutoLock(); alert('Password changed — vault re-encrypted.');
   });
   $('#saveBannerBtn').addEventListener('click', () => { if (!adminSession) return; publicConfig.bannerEnabled = $('#bannerEnabled').checked; publicConfig.bannerText = $('#bannerText').value.trim(); savePublic(); renderBanner(); alert('Banner saved.'); });
   $('#addCustomSiteBtn').addEventListener('click', () => {
@@ -644,13 +665,13 @@ document.addEventListener('DOMContentLoaded', () => {
   $('#adminCountySelect').addEventListener('change', (e) => { $('#adminCountyNote').value = (publicConfig.countyNotes || {})[e.target.value] || ''; });
   $('#saveCountyNoteBtn').addEventListener('click', () => { if (!adminSession) return; publicConfig.countyNotes = publicConfig.countyNotes || {}; publicConfig.countyNotes[$('#adminCountySelect').value] = $('#adminCountyNote').value.trim(); savePublic(); renderCounty(); alert('County note saved.'); });
   $('#encBackupBtn').addEventListener('click', async () => {
-    if (!cryptoOK) { alert('Web Crypto unavailable.'); return; } const pw = prompt('Password for this encrypted backup (8+ characters):', ''); if (!pw || pw.length < 8) { alert('Backup cancelled — password needs 8+ characters.'); return; }
+    if (!cryptoOK) { alert('Web Crypto unavailable.'); return; } const pw = prompt('Password for this encrypted backup (10+ characters):', ''); if (!pw || pw.length < 10) { alert('Backup cancelled — password needs 10+ characters.'); return; }
     const salt = crypto.getRandomValues(new Uint8Array(16)); const key = await deriveKey(pw, salt); const enc = await encryptJSON(key, gatherAll());
-    download('california-job-finder-ENCRYPTED-backup-' + todayISO() + '.json', JSON.stringify({ format:'sjf-encrypted-backup', version:1, salt:b64(salt), iv:enc.iv, data:enc.data }, null, 2), 'application/json');
+    download('california-job-finder-ENCRYPTED-backup-' + todayISO() + '.json', JSON.stringify({ format:'sjf-encrypted-backup', version:1, salt:b64(salt), iv:enc.iv, data:enc.data, iterations: ADMIN_ITER }, null, 2), 'application/json');
   });
   $('#encRestoreInput').addEventListener('change', (e) => {
     const f = e.target.files && e.target.files[0]; if (!f) return; const r = new FileReader();
-    r.onload = async () => { try { const file = JSON.parse(String(r.result || '')); if (file.format !== 'sjf-encrypted-backup') throw new Error('Not an encrypted backup file.'); const pw = prompt('Password for this encrypted backup:', ''); if (!pw) return; const key = await deriveKey(pw, unb64(file.salt)); const data = await decryptJSON(key, file.iv, file.data); if (!confirm('Restore this encrypted backup?')) return; if (!restoreData(data)) throw new Error('Decrypted, but the contents were not recognized.'); alert('Encrypted backup restored.'); } catch (err) { alert('Could not restore encrypted backup (wrong password or bad file).'); } };
+    r.onload = async () => { try { const file = JSON.parse(String(r.result || '')); if (file.format !== 'sjf-encrypted-backup') throw new Error('Not an encrypted backup file.'); const pw = prompt('Password for this encrypted backup:', ''); if (!pw) return; const key = await deriveKey(pw, unb64(file.salt), Number(file.iterations) || LEGACY_ITER); const data = await decryptJSON(key, file.iv, file.data); if (!confirm('Restore this encrypted backup?')) return; if (!restoreData(data)) throw new Error('Decrypted, but the contents were not recognized.'); alert('Encrypted backup restored.'); } catch (err) { alert('Could not restore encrypted backup (wrong password or bad file).'); } };
     r.readAsText(f); e.target.value = '';
   });
   $('#wipeProfileBtn').addEventListener('click', () => $('#deleteProfileBtn').click());

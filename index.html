@@ -3,6 +3,8 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; font-src 'self'; connect-src 'none'; object-src 'none'; base-uri 'self'; form-action 'self'; frame-src 'none'; worker-src 'none'">
+<meta name="referrer" content="strict-origin-when-cross-origin">
 <title>Stanislaus Job Finder — California Job Finder for Every County</title>
 <meta name="description" content="Find jobs anywhere in California: pick any of the 58 counties, your city and ZIP. Remote-first, walk/bike and transit-friendly searching with a private multi-profile application tracker and an encrypted admin vault.">
 <link rel="stylesheet" href="styles.css">
@@ -90,9 +92,9 @@
     <div class="bus-box">
       <div>
         <h3 id="transitBoxTitle">🚌 Stanislaus Regional Transit (StanRTA)</h3>
-        <p id="transitBoxText">Modesto city buses + county routes (Modesto ⇄ Ceres and more). Check schedules and fares at <a href="https://www.stanrta.org/" target="_blank" rel="noopener">stanrta.org</a>.</p>
+        <p id="transitBoxText">Modesto city buses + county routes (Modesto ⇄ Ceres and more). Check schedules and fares at <a href="https://www.stanrta.org/" target="_blank" rel="noopener noreferrer">stanrta.org</a>.</p>
       </div>
-      <a class="btn btn-bus" id="busRouteBtn" href="https://www.google.com/maps/dir/?api=1&amp;origin=Modesto%2C+CA+95355&amp;destination=Modesto%2C+CA&amp;travelmode=transit" target="_blank" rel="noopener">🗺️ <span data-i18n="checkBus">Check bus route</span></a>
+      <a class="btn btn-bus" id="busRouteBtn" href="https://www.google.com/maps/dir/?api=1&amp;origin=Modesto%2C+CA+95355&amp;destination=Modesto%2C+CA&amp;travelmode=transit" target="_blank" rel="noopener noreferrer">🗺️ <span data-i18n="checkBus">Check bus route</span></a>
     </div>
   </section>
 
@@ -291,7 +293,7 @@
   <!-- ======================= DIRECTORY ======================= -->
   <section class="card" id="directory" aria-labelledby="dirTitle">
     <h2 id="dirTitle">🌐 <span data-i18n="dirTitle">Job Sites Directory</span></h2>
-    <p class="muted">Built from the Stanislaus County Workforce Development guide, <a href="https://stanworkforce.com/media/zonmxzhn/job-search-website-resources.pdf" target="_blank" rel="noopener">“Job Search Website Resources” (PDF)</a>, and expanded for all of California. Every <strong>Search</strong> button is a live search for your current job + your city/ZIP. ☆ favorites and admin-added sites are marked.</p>
+    <p class="muted">Built from the Stanislaus County Workforce Development guide, <a href="https://stanworkforce.com/media/zonmxzhn/job-search-website-resources.pdf" target="_blank" rel="noopener noreferrer">“Job Search Website Resources” (PDF)</a>, and expanded for all of California. Every <strong>Search</strong> button is a live search for your current job + your city/ZIP. ☆ favorites and admin-added sites are marked.</p>
     <p class="tip-box">💡 <strong>Go direct when you can:</strong> employers post on their <em>own</em> websites first because it’s free for them — check Direct Employers before the big boards.</p>
     <div id="directoryGroups"></div>
     <p class="small muted" id="directoryEmpty" hidden>No sites match that filter. Try a shorter word — e.g. “indeed”, “remote”, “county”, “health”.</p>
@@ -320,23 +322,23 @@
       <article class="help-card">
         <h3>🟦 CalJOBS (free, statewide)</h3>
         <p>California’s free state job board from the EDD. Search and apply across the state, and get help at your local America’s Job Center.</p>
-        <p><a class="btn btn-secondary" href="https://www.caljobs.ca.gov/" target="_blank" rel="noopener">caljobs.ca.gov ↗</a></p>
+        <p><a class="btn btn-secondary" href="https://www.caljobs.ca.gov/" target="_blank" rel="noopener noreferrer">caljobs.ca.gov ↗</a></p>
       </article>
       <article class="help-card">
         <h3>🏢 Your County Workforce / AJCC</h3>
         <p id="helpWorkforceText">Free job-search help, workshops, resume help and computer access. Stanislaus: Stanislaus Workforce Development.</p>
-        <p><a class="btn btn-secondary" id="helpWorkforceBtn" href="https://www.stanworkforce.com/" target="_blank" rel="noopener">Find workforce help ↗</a>
-        <a class="btn btn-ghost" href="https://www.careeronestop.org/LocalHelp/AmericanJobCenters/american-job-centers.aspx" target="_blank" rel="noopener">Find an AJCC near you ↗</a></p>
+        <p><a class="btn btn-secondary" id="helpWorkforceBtn" href="https://www.stanworkforce.com/" target="_blank" rel="noopener noreferrer">Find workforce help ↗</a>
+        <a class="btn btn-ghost" href="https://www.careeronestop.org/LocalHelp/AmericanJobCenters/american-job-centers.aspx" target="_blank" rel="noopener noreferrer">Find an AJCC near you ↗</a></p>
       </article>
       <article class="help-card">
         <h3>🚌 Plan Your Trip</h3>
         <p id="helpTransitText">Check transit before you apply — route, fare, and the trip home at your shift time.</p>
-        <p><a class="btn btn-secondary" id="helpTransitBtn" href="https://www.google.com/maps/dir/?api=1&amp;origin=Modesto%2C+CA+95355&amp;destination=Modesto%2C+CA&amp;travelmode=transit" target="_blank" rel="noopener">Check transit route ↗</a></p>
+        <p><a class="btn btn-secondary" id="helpTransitBtn" href="https://www.google.com/maps/dir/?api=1&amp;origin=Modesto%2C+CA+95355&amp;destination=Modesto%2C+CA&amp;travelmode=transit" target="_blank" rel="noopener noreferrer">Check transit route ↗</a></p>
       </article>
       <article class="help-card">
         <h3>📄 Stanislaus Guide (source of this directory)</h3>
         <p>The “Job Search Website Resources” PDF from Stanislaus County Workforce Development that this directory is built from.</p>
-        <p><a class="btn btn-secondary" href="https://stanworkforce.com/media/zonmxzhn/job-search-website-resources.pdf" target="_blank" rel="noopener">Open the PDF ↗</a> <a class="btn btn-ghost" href="https://www.stanworkforce.com/" target="_blank" rel="noopener">stanworkforce.com ↗</a></p>
+        <p><a class="btn btn-secondary" href="https://stanworkforce.com/media/zonmxzhn/job-search-website-resources.pdf" target="_blank" rel="noopener noreferrer">Open the PDF ↗</a> <a class="btn btn-ghost" href="https://www.stanworkforce.com/" target="_blank" rel="noopener noreferrer">stanworkforce.com ↗</a></p>
       </article>
     </div>
 
@@ -355,7 +357,7 @@
 
     <div id="adminSetup" hidden>
       <h3>Create the admin vault</h3>
-      <p class="muted small">First time only. Choose a strong password (8+ characters). <strong>There is no reset</strong> — if you forget it, you can only delete the vault and start over.</p>
+      <p class="muted small">First time only. Choose a strong password (10+ characters). <strong>There is no reset</strong> — if you forget it, you can only delete the vault and start over.</p>
       <div class="form-grid">
         <div class="field"><label for="adminNewPassword">Admin password</label><input type="password" id="adminNewPassword" autocomplete="new-password"></div>
         <div class="field"><label for="adminNewPassword2">Repeat password</label><input type="password" id="adminNewPassword2" autocomplete="new-password"></div>
